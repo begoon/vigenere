@@ -51,3 +51,12 @@ Fixtures are loaded from `../data/`; they are not used by the attack.
 The original `crack.py` / `find_keyword.py` two-stage workflow has been replaced
 by the single `main.py` entry point. Its hardcoded crib, keyword list and
 `cipher-params.txt` output have been removed.
+
+## Formatting
+
+From the repository root:
+
+```sh
+uv tool run black python scripts
+uv tool run black --check python scripts
+```

@@ -1,0 +1,56 @@
+# Zig implementation
+
+See the [main README](../README.md) for the cipher, attack, shared data,
+findings, and cross-language benchmarks.
+
+## Version
+
+Requires Zig 0.16.0; tested on macOS arm64. The implementation uses Zig's
+standard library and does not require Go or Python at runtime.
+
+## Build and run
+
+From this directory:
+
+```sh
+zig build -Doptimize=ReleaseFast
+./zig-out/bin/vigenerecrack
+./zig-out/bin/vigenerecrack ../data/crypted-ru.txt
+```
+
+Or build and run in one command:
+
+```sh
+zig build run -Doptimize=ReleaseFast -- ../data/crypted-ru.txt
+```
+
+The optional first argument is a UTF-8 ciphertext filename. Without it, the
+program locates `data/crypted-ru.txt` from the repository root or this directory.
+It prints the period, keyword, mixed alphabet and entire literal plaintext in
+the common output format. Input errors exit with status 1. Use an optimized
+build for the full search; the default build mode is Debug.
+
+## Test
+
+```sh
+zig build test
+zig build test -Doptimize=ReleaseSafe -Dintegration=true
+```
+
+Routine tests cover normalization, period detection, rotation invariance,
+language counts, the RNG, and the same incremental-score matrix as Go/Python.
+The opt-in integration test executes all 11.52 million proposals and checks
+the period, key, alphabet and every golden plaintext letter. Tests read the
+shared fixtures in `../data/`; `zig build` sets the test working directory.
+The expected plaintext is not embedded in the solver.
+
+## Implementation notes
+
+`main.zig` uses `f64` scores and explicit uint64 RNG arithmetic. Temporary
+mutation plans use a search-local arena; best-solution buffers are reused.
+Arithmetic remains strict in ReleaseFast; floating-point library differences
+can nevertheless change the annealing trajectory across languages/platforms.
+
+`tri.txt` and `quad.txt` are aggregate model counts embedded at compile time.
+Regenerate them and Python's copies with
+`python3 ../scripts/extract_ngrams.py` after changing Go's counts.
