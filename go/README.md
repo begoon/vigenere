@@ -43,6 +43,8 @@ keyword, alphabet and [`../data/decrypted-ru.txt`](../data/decrypted-ru.txt).
 
 ## Implementation notes
 
-`main.go` contains the solver and aggregate language counts. The search uses
+`main.go` contains the solver. `tri.txt` and `quad.txt` contain the aggregate
+language counts, embedded with `go:embed` at build time. They use the same
+format and contents as Zig's model files; tests verify that they stay identical. The search uses
 `float64` scores, an explicit uint64 RNG, precomputed mutation plans, periodic
 score refreshes and reusable best-solution buffers. It runs on one thread.

@@ -244,10 +244,12 @@ The [anomaly image](data/anomaly-ru.png) records this finding.
 `data/` contains the shared puzzle assets. `scripts/` contains cross-language
 utilities, and `benchmarks/` stores raw timing results.
 
-The language model counts are embedded in Go and copied into Zig model
-files. After editing Go's counts, run `python3 scripts/extract_ngrams.py` to
-regenerate the Zig copies. These model files are distinct from the puzzle inputs
-and golden answer.
+Both implementations keep aggregate model counts in `tri.txt` and `quad.txt`.
+Each line contains a positive count, a space, and concatenated Russian n-grams
+of that size. Go embeds its files with `go:embed`; Zig uses `@embedFile`, so
+neither executable needs model files at runtime. Keep the Go and Zig copies
+identical when updating the model; Go's tests check this. These model files
+are distinct from the puzzle inputs and golden answer in `data/`.
 
 The former pure-Python solver is available in Git history at commit `29673fe`.
 It was removed because it duplicated the same algorithm with much longer

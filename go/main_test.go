@@ -10,7 +10,10 @@ import (
 // Exercise every swap/column, including absent letters, overlapping windows,
 // short texts, accepted proposals and rejected proposals.
 func TestIncrementalScores(t *testing.T) {
-	tri, quad := loadLanguageScores()
+	tri, quad, err := loadLanguageScores()
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, n := range []int{1, 2, 3, 4, 17, 80, 738} {
 		for _, period := range []int{1, 3, 7} {
 			random := rng{state: 12345}
@@ -91,7 +94,10 @@ func TestFullRecovery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tri, quad := loadLanguageScores()
+	tri, quad, err := loadLanguageScores()
+	if err != nil {
+		t.Fatal(err)
+	}
 	period := findPeriod(cipher)
 	if period != 7 {
 		t.Fatalf("period = %d", period)
@@ -114,5 +120,46 @@ func TestFullRecovery(t *testing.T) {
 	}
 	if letters(answer.plain) != strings.TrimSpace(string(expected)) {
 		t.Fatal("incorrect plaintext")
+	}
+}
+
+func TestNgramFiles(t *testing.T) {
+	for name, data := range map[string]string{"tri.txt": triData, "quad.txt": quadData} {
+		zigData, err := os.ReadFile("../zig/" + name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if data != string(zigData) {
+			t.Fatalf("%s differs between Go and Zig", name)
+		}
+	}
+	tri, quad, err := loadLanguageScores()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tri) != 32*32*32 || len(quad) != 32*32*32*32 {
+		t.Fatal("incorrect table sizes")
+	}
+	code := 0
+	for _, letter := range "ЕНИЯ" {
+		code = code*32 + letterIndex(letter)
+	}
+	if quad[code] != math.Log(2173.02) || quad[0] != math.Log(.02) {
+		t.Fatal("incorrect counts or smoothing")
+	}
+}
+
+func TestNgramTableValidation(t *testing.T) {
+	for _, data := range []string{"bad АБВ", "0 АБВ", "-1 АБВ", "1 АБ", "1 АБЁ", "1 abc", "1 АБВ extra", "1"} {
+		if _, err := loadNgramTable(data, 3, .05); err == nil {
+			t.Errorf("accepted invalid data: %q", data)
+		}
+	}
+	table, err := loadNgramTable("2 АБВГДЕ\n\n", 3, .05)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if table[(0*32+1)*32+2] != math.Log(2.05) || table[(3*32+4)*32+5] != math.Log(2.05) {
+		t.Fatal("group not expanded correctly")
 	}
 }

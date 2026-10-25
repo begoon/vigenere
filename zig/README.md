@@ -52,5 +52,5 @@ Arithmetic remains strict in ReleaseFast; floating-point library differences
 can nevertheless change the annealing trajectory across languages/platforms.
 
 `tri.txt` and `quad.txt` are aggregate model counts embedded at compile time.
-Regenerate them with
-`python3 ../scripts/extract_ngrams.py` after changing Go's counts.
+They have the same format and contents as Go's files. Update both copies
+together; Go's tests verify that they remain identical.
