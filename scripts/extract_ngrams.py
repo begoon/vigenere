@@ -1,4 +1,4 @@
-"""Regenerate Zig's and Python's counts from the original Go source (stdlib only)."""
+"""Regenerate Zig's counts from the original Go source (stdlib only)."""
 
 from pathlib import Path
 import re
@@ -16,5 +16,4 @@ for name, size in [("tri", 3), ("quad", 4)]:
         assert all("А" <= c <= "Я" for c in data)
         rows.append(f"{count} {data}\n")
     assert rows
-    for destination in (root / "zig", root / "python"):
-        (destination / f"{name}.txt").write_text("".join(rows), encoding="utf-8")
+    (root / "zig" / f"{name}.txt").write_text("".join(rows), encoding="utf-8")

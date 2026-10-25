@@ -38,7 +38,7 @@ zig build test -Doptimize=ReleaseSafe -Dintegration=true
 ```
 
 Routine tests cover normalization, period detection, rotation invariance,
-language counts, the RNG, and the same incremental-score matrix as Go/Python.
+language counts, the RNG, and the same incremental-score matrix as Go.
 The opt-in integration test executes all 11.52 million proposals and checks
 the period, key, alphabet and every golden plaintext letter. Tests read the
 shared fixtures in `../data/`; `zig build` sets the test working directory.
@@ -52,5 +52,5 @@ Arithmetic remains strict in ReleaseFast; floating-point library differences
 can nevertheless change the annealing trajectory across languages/platforms.
 
 `tri.txt` and `quad.txt` are aggregate model counts embedded at compile time.
-Regenerate them and Python's copies with
+Regenerate them with
 `python3 ../scripts/extract_ngrams.py` after changing Go's counts.

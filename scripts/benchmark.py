@@ -8,7 +8,6 @@ from pathlib import Path
 import platform
 import statistics
 import subprocess
-import sys
 import tempfile
 import time
 
@@ -24,14 +23,11 @@ def main():
     parser.add_argument(
         "--languages",
         nargs="+",
-        choices=("go", "zig", "python"),
-        default=["go", "zig", "python"],
+        choices=("go", "zig"),
+        default=["go", "zig"],
     )
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("--warmups", type=int, default=1)
-    parser.add_argument(
-        "--python", default=sys.executable, help="Python interpreter for the solver"
-    )
     parser.add_argument("--input", type=Path, default=ROOT / "data/crypted-ru.txt")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -64,11 +60,6 @@ def main():
             commands["Zig"] = [str(tmp / "zig/bin/vigenerecrack")]
             versions["Zig"] = command(
                 ["zig", "version"], capture_output=True, text=True
-            ).stdout.strip()
-        if "python" in args.languages:
-            commands["Python"] = [args.python, "-B", str(ROOT / "python/main.py")]
-            versions["Python"] = command(
-                [args.python, "--version"], capture_output=True, text=True
             ).stdout.strip()
         expected = None
         known_input = (

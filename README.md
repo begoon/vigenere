@@ -5,8 +5,7 @@ Programmers*. The Vigenère base alphabet is an unknown permutation of the
 32-letter Russian alphabet, without Ё. Both the repeated keyword and the mixed
 alphabet must be recovered.
 
-The [Python](python/README.md), [Go](go/README.md), and [Zig](zig/README.md)
-implementations use the same ciphertext-only attack. They share the language
+The [Go](go/README.md) and [Zig](zig/README.md) implementations use the same ciphertext-only attack. They share the language
 counts, random generator, search budget, incremental scoring, and output format.
 There is no hardcoded plaintext phrase or keyword dictionary in the solver.
 
@@ -17,7 +16,6 @@ and tests:
 
 | Implementation | Requirements | Quick start from repository root |
 | --- | --- | --- |
-| [Python](python/README.md) | Python 3.13+; tested with CPython 3.14.8 | `python3 python/main.py` |
 | [Go](go/README.md) | Go 1.26+; tested with Go 1.27.1 | `cd go && go run .` |
 | [Zig](zig/README.md) | Zig 0.16.0 | `cd zig && zig build run -Doptimize=ReleaseFast` |
 
@@ -161,20 +159,18 @@ also heuristic, so recovery on arbitrary ciphertexts is not guaranteed.
 ## Benchmarks
 
 Measured on macOS 27.0.1 arm64, using default compiler targets, Go's normal
-optimized build and Zig ReleaseFast. Each row is **one complete run with no
-benchmark warmup**, measured sequentially on the same machine:
+optimized build and Zig ReleaseFast. Each implementation had one discarded
+warmup and three measured runs, in alternating order:
 
-| Implementation | Version | Elapsed time |
+| Implementation | Version | Median elapsed time |
 | --- | --- | ---: |
-| Zig | 0.16.0 | 5.51 s |
-| Go | 1.27.1 | 6.02 s |
-| Python (CPython) | 3.14.8 | 480.34 s (8 min) |
+| Zig | 0.16.0 | 4.34 s |
+| Go | 1.27.1 | 6.07 s |
 
-[Raw three-language results](benchmarks/all-languages.json) include exact times,
-versions, and input/output hashes. The Python implementation deliberately uses
-ordinary Python loops and the standard library, without a native/JIT backend.
-Single samples on a non-isolated development machine are illustrative; use
-repeated runs for a more stable comparison.
+[Raw results](benchmarks/go-zig-incremental.json) include all samples, versions,
+and input/output hashes. Zig was about 1.40× faster in this comparison.
+Measurements on a non-isolated development machine are illustrative; timings
+vary across runs and machines.
 
 All implementations use the same input, language model, single-threaded search
 and proposal budget. Timings cover process startup, input/model loading, search,
@@ -182,15 +178,15 @@ and captured output; compilation is excluded. Every measured output must match
 the golden key, alphabet, and plaintext. These are measurements of this puzzle
 on one machine, not a general language ranking.
 
-To reproduce a single-run comparison from the repository root:
+To reproduce the comparison from the repository root (requires Python 3 for
+the benchmark script, plus Go and Zig):
 
 ```sh
-python3 scripts/benchmark.py --runs 1 --warmups 0 --output benchmarks/all-languages.json
+python3 scripts/benchmark.py --runs 3 --warmups 1 --output benchmarks/go-zig-incremental.json
 ```
 
-For stronger repeatability, use `--runs 3 --warmups 1`; this takes much longer
-with Python. Use `--languages go zig` to time only compiled implementations,
-`--python PATH` to select a Python interpreter, or `--input PATH` for other input.
+Use `--runs 1 --warmups 0` for a quicker check, `--languages go` or
+`--languages zig` to select one implementation, or `--input PATH` for other input.
 
 Before incremental scoring, the Go/Zig medians were 25.232/22.880 seconds.
 The earlier optimized medians were 6.067/4.337 seconds: improvements of
@@ -200,15 +196,15 @@ before/after trials. Raw data: [original](benchmarks/go-zig-original.json) and
 
 ## Tests
 
-All three compare incremental scores with full rescoring using identical
+Both implementations compare incremental scores with full rescoring using identical
 random seeds, text lengths (1, 2, 3, 4, 17, 80, 738), periods (1, 3, 7), every
-swap/column mutation, and repeated commits and rollbacks. Python and Zig also
+swap/column mutation, and repeated commits and rollbacks. Zig also
 check normalization, period detection, RNG values, language counts, and rotation
 invariance. Full-search tests check the detected period, key, alphabet and all
 738 plaintext letters against the shared golden fixture.
 
 See the language READMEs for routine and full-test commands. Full recovery is
-opt-in so ordinary Python tests finish in seconds.
+opt-in to keep routine tests short.
 
 ## Shared puzzle data and findings
 
@@ -216,7 +212,7 @@ All puzzle assets live in [`data/`](data/):
 
 | File | Purpose |
 | --- | --- |
-| [crypted-ru.txt](data/crypted-ru.txt) | Russian ciphertext used by all three implementations |
+| [crypted-ru.txt](data/crypted-ru.txt) | Russian ciphertext used by both implementations |
 | [decrypted-ru.txt](data/decrypted-ru.txt) | Golden expected plaintext, used only for validation |
 | [anomaly-ru.png](data/anomaly-ru.png) | Image documenting the suspected transcription error |
 | [crypted-en.txt](data/crypted-en.txt) | Separate English ciphertext puzzle |
@@ -244,11 +240,17 @@ The [anomaly image](data/anomaly-ru.png) records this finding.
 
 ## Repository layout
 
-`python/`, `go/`, and `zig/` contain language implementations and tests.
+`go/` and `zig/` contain language implementations and tests.
 `data/` contains the shared puzzle assets. `scripts/` contains cross-language
 utilities, and `benchmarks/` stores raw timing results.
 
-The language model counts are embedded in Go and copied into Python/Zig model
+The language model counts are embedded in Go and copied into Zig model
 files. After editing Go's counts, run `python3 scripts/extract_ngrams.py` to
-regenerate both copies. These model files are distinct from the puzzle inputs
+regenerate the Zig copies. These model files are distinct from the puzzle inputs
 and golden answer.
+
+The former pure-Python solver is available in Git history at commit `29673fe`.
+It was removed because it duplicated the same algorithm with much longer
+runtimes. Python is only used for optional maintenance and benchmark scripts;
+neither solver needs it at runtime. Format those scripts with
+`uv tool run black scripts`.
