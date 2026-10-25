@@ -1,0 +1,26 @@
+{
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "go_version": "go version go1.27.1 darwin/arm64",
+  "zig_version": "0.16.0",
+  "input": "go/crypted-ru.txt",
+  "input_sha256": "3398cda66bb66331117c74ca58c84360dd48d39098ab1d89f1f8550673774437",
+  "output_sha256": "bc891f0b9ff81c26e56cfd85adff48f9069d56b10f4142882e5f1ef9a16f0ef1",
+  "warmups_per_binary": 1,
+  "seconds": {
+    "Go": [
+      24.860074374824762,
+      25.67328887502663,
+      25.231706708902493
+    ],
+    "Zig": [
+      23.044368375092745,
+      22.87991691706702,
+      22.637179207988083
+    ]
+  },
+  "median_seconds": {
+    "Go": 25.231706708902493,
+    "Zig": 22.87991691706702
+  },
+  "go_over_zig": 1.1027883886274596
+}
