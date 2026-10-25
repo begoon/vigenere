@@ -127,62 +127,142 @@ type solution struct {
 	mapping, shifts, plain []int
 }
 
-// crack jointly searches the unknown permutation and the shift of every key
-// column. Its two moves are swapping entries of the permutation and changing
-// one column shift. Simulated annealing maximizes Russian n-gram likelihood.
+// mutationPlan contains changed letters and the union of overlapping scoring
+// windows. Plans depend only on ciphertext and period, not the search state.
+// Each window combines its trigram and (when present) tetragram contribution.
+type mutationPlan struct{ positions, windows []int }
+
+func makePlan(cipher []int, positions []int) mutationPlan {
+	touched := make([]bool, len(cipher))
+	for _, pos := range positions {
+		for start := max(0, pos-3); start <= pos && start+2 < len(cipher); start++ {
+			touched[start] = true
+		}
+	}
+	plan := mutationPlan{positions: positions}
+	for i, yes := range touched {
+		if yes {
+			plan.windows = append(plan.windows, i)
+		}
+	}
+	return plan
+}
+
+func mutationPlans(cipher []int, period int) ([]mutationPlan, []int) {
+	plans := make([]mutationPlan, 1024+period)
+	columns := make([]int, len(cipher))
+	for i := range cipher {
+		columns[i] = i % period
+	}
+	for x := 0; x < 32; x++ {
+		for y := x + 1; y < 32; y++ {
+			var positions []int
+			for i, c := range cipher {
+				if c == x || c == y {
+					positions = append(positions, i)
+				}
+			}
+			plan := makePlan(cipher, positions)
+			plans[x*32+y], plans[y*32+x] = plan, plan
+		}
+	}
+	for col := 0; col < period; col++ {
+		var positions []int
+		for i := col; i < len(cipher); i += period {
+			positions = append(positions, i)
+		}
+		plans[1024+col] = makePlan(cipher, positions)
+	}
+	return plans, columns
+}
+
+func windowScore(plain []int, i int, tri, quad []float64) float64 {
+	code := (plain[i]*32+plain[i+1])*32 + plain[i+2]
+	score := .25 * tri[code]
+	if i+3 < len(plain) {
+		score += quad[code*32+plain[i+3]]
+	}
+	return score
+}
+
+func refreshScores(plain []int, cached, tri, quad []float64) float64 {
+	score := 0.0
+	for i := range cached {
+		cached[i] = windowScore(plain, i, tri, quad)
+		score += cached[i]
+	}
+	return score
+}
+
+func updatePositions(plan mutationPlan, cipher, columns, mapping, shifts, plain []int) {
+	for _, i := range plan.positions {
+		plain[i] = (mapping[cipher[i]] + 32 - shifts[columns[i]]) % 32
+	}
+}
+
+// Full search budget is unchanged. Only windows affected by a mutation are
+// rescored; rejected proposals leave the score cache untouched.
 func crack(cipher []int, period int, tri, quad []float64) solution {
 	random := rng{state: 0x9e3779b97f4a7c15}
-	best := solution{score: math.Inf(-1)}
+	best := solution{score: math.Inf(-1), mapping: make([]int, 32), shifts: make([]int, period), plain: make([]int, len(cipher))}
+	plans, columns := mutationPlans(cipher, period)
+	cached := make([]float64, max(0, len(cipher)-2))
+	proposed := make([]float64, len(cached))
 	const restarts, iterations, epoch = 48, 240000, 30000
 	for restart := 0; restart < restarts; restart++ {
 		mapping := random.permutation()
 		shifts := make([]int, period)
-		// Fix shift 0 to remove a redundant global rotation.
 		for i := 1; i < period; i++ {
 			shifts[i] = random.n(32)
 		}
 		plain := decode(cipher, mapping, shifts)
-		score := languageScore(plain, tri, quad)
+		score := refreshScores(plain, cached, tri, quad)
 		for iteration := 0; iteration < iterations; iteration++ {
+			// Bound accumulated rounding drift once per cooling epoch.
+			if iteration%epoch == 0 {
+				score = refreshScores(plain, cached, tri, quad)
+			}
 			phase := float64(iteration%epoch) / epoch
 			temp := 14*(1-phase) + .25
-			old := score
-			if random.n(4) != 0 || period == 1 {
-				a, b := random.n(32), random.n(32)
-				mapping[a], mapping[b] = mapping[b], mapping[a]
-				for i, c := range cipher {
-					if c == a || c == b {
-						plain[i] = (mapping[c] - shifts[i%period] + 32) % 32
-					}
-				}
-				score = languageScore(plain, tri, quad)
-				if score < old && random.unit() > math.Exp((score-old)/temp) {
-					mapping[a], mapping[b] = mapping[b], mapping[a]
-					for i, c := range cipher {
-						if c == a || c == b {
-							plain[i] = (mapping[c] - shifts[i%period] + 32) % 32
-						}
-					}
-					score = old
-				}
+			swap := random.n(4) != 0 || period == 1
+			var plan mutationPlan
+			var x, y, col, oldShift int
+			if swap {
+				x, y = random.n(32), random.n(32)
+				mapping[x], mapping[y] = mapping[y], mapping[x]
+				plan = plans[x*32+y]
 			} else {
-				col := 1 + random.n(period-1)
-				oldShift := shifts[col]
+				col = 1 + random.n(period-1)
+				oldShift = shifts[col]
 				shifts[col] = random.n(32)
-				for i := col; i < len(cipher); i += period {
-					plain[i] = (mapping[cipher[i]] - shifts[col] + 32) % 32
+				if shifts[col] != oldShift {
+					plan = plans[1024+col]
 				}
-				score = languageScore(plain, tri, quad)
-				if score < old && random.unit() > math.Exp((score-old)/temp) {
+			}
+			updatePositions(plan, cipher, columns, mapping, shifts, plain)
+			delta := 0.0
+			for j, i := range plan.windows {
+				proposed[j] = windowScore(plain, i, tri, quad)
+				delta += proposed[j] - cached[i]
+			}
+			if delta < 0 && random.unit() > math.Exp(delta/temp) {
+				if swap {
+					mapping[x], mapping[y] = mapping[y], mapping[x]
+				} else {
 					shifts[col] = oldShift
-					for i := col; i < len(cipher); i += period {
-						plain[i] = (mapping[cipher[i]] - shifts[col] + 32) % 32
-					}
-					score = old
+				}
+				updatePositions(plan, cipher, columns, mapping, shifts, plain)
+			} else {
+				score += delta
+				for j, i := range plan.windows {
+					cached[i] = proposed[j]
 				}
 			}
 			if score > best.score {
-				best = solution{score, append([]int(nil), mapping...), append([]int(nil), shifts...), append([]int(nil), plain...)}
+				best.score = score
+				copy(best.mapping, mapping)
+				copy(best.shifts, shifts)
+				copy(best.plain, plain)
 			}
 		}
 	}
