@@ -257,6 +257,13 @@ runtimes. Python is only used for optional maintenance and benchmark scripts;
 neither solver needs it at runtime. Format those scripts with
 `uv tool run black scripts`.
 
+## Cleanup
+
+Run `just clean` from the repository root to remove the Go executable, Zig
+build outputs/cache, Python bytecode caches, and the local `.venv`. Source,
+model files, shared puzzle data, benchmark results, and global tool caches are
+preserved. Requires `just`.
+
 ## License
 
 [MIT](LICENSE).
