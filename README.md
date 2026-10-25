@@ -256,3 +256,7 @@ It was removed because it duplicated the same algorithm with much longer
 runtimes. Python is only used for optional maintenance and benchmark scripts;
 neither solver needs it at runtime. Format those scripts with
 `uv tool run black scripts`.
+
+## License
+
+[MIT](LICENSE).
