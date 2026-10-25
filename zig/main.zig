@@ -294,10 +294,23 @@ fn writeLetters(w: *std.Io.Writer, values: []const usize) !void {
     }
     try w.writeByte('\n');
 }
+fn defaultFilename(io: std.Io) []const u8 {
+    std.Io.Dir.cwd().access(io, "data/crypted-ru.txt", .{}) catch return "../data/crypted-ru.txt";
+    return "data/crypted-ru.txt";
+}
+
+// Test fixtures live outside the implementation; no plaintext enters the binary.
+fn readTestFixture(filename: []const u8) ![]usize {
+    const a = std.testing.allocator;
+    const bytes = try std.Io.Dir.cwd().readFileAlloc(std.testing.io, filename, a, .unlimited);
+    defer a.free(bytes);
+    return normalize(a, bytes);
+}
+
 pub fn main(init: std.process.Init) !void {
     const a = init.arena.allocator();
     const args = try init.minimal.args.toSlice(a);
-    const filename = if (args.len > 1) args[1] else "crypted-ru.txt";
+    const filename = if (args.len > 1) args[1] else defaultFilename(init.io);
     const bytes = std.Io.Dir.cwd().readFileAlloc(init.io, filename, a, .unlimited) catch |err| {
         std.debug.print("{s}: {s}\n", .{ filename, @errorName(err) });
         std.process.exit(1);
@@ -339,7 +352,7 @@ test "period detection and short inputs" {
     for (&cipher, 0..) |*x, i| x.* = i % 7;
     try std.testing.expectApproxEqAbs(@as(f64, 1), indexOfCoincidence(&cipher, 7), 1e-12);
     const a = std.testing.allocator;
-    const supplied = try normalize(a, @embedFile("crypted-ru.txt"));
+    const supplied = try readTestFixture("../data/crypted-ru.txt");
     defer a.free(supplied);
     try std.testing.expectEqual(@as(usize, 738), supplied.len);
     try std.testing.expectEqual(@as(usize, 7), findPeriod(supplied));
@@ -435,9 +448,9 @@ test "incremental scoring matches full rescoring across accepted and rejected mo
 test "full recovery matches known key alphabet and plaintext" {
     if (!@import("test_options").integration) return error.SkipZigTest;
     const a = std.testing.allocator;
-    const cipher = try normalize(a, @embedFile("crypted-ru.txt"));
+    const cipher = try readTestFixture("../data/crypted-ru.txt");
     defer a.free(cipher);
-    const expected = try normalize(a, @embedFile("decrypted-ru.txt"));
+    const expected = try readTestFixture("../data/decrypted-ru.txt");
     defer a.free(expected);
     const scores = try Scores.init(a);
     defer scores.deinit(a);

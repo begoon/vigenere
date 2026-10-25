@@ -14,5 +14,6 @@ pub fn build(b: *std.Build) void {
     if (b.args) |args| run.addArgs(args);
     b.step("run", "Crack a ciphertext").dependOn(&run.step);
     const tests = b.addRunArtifact(b.addTest(.{ .root_module = module }));
+    tests.setCwd(b.path("."));
     b.step("test", "Run unit tests").dependOn(&tests.step);
 }

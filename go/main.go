@@ -304,9 +304,11 @@ func recoveredAlphabet(mapping []int, rotation int) string {
 }
 
 func main() {
-	filename := "crypted-ru.txt"
+	filename := "data/crypted-ru.txt"
 	if len(os.Args) > 1 {
 		filename = os.Args[1]
+	} else if _, err := os.Stat(filename); os.IsNotExist(err) {
+		filename = "../data/crypted-ru.txt"
 	}
 	cipher, err := readCiphertext(filename)
 	if err != nil {
