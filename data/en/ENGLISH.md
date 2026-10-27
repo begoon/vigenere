@@ -2,22 +2,21 @@
 
 ## Source fidelity
 
-`crypted-en.png` is the reference scan of Figure 24-1. The original
-`crypted-en.txt` transcript was checked against its eleven printed lines:
+[crypted-en.png](crypted-en.png) is the reference scan of Figure 24-1. The original
+[crypted-en.txt](crypted-en.txt) transcript was checked against its eleven printed lines:
 595 letters, in five-letter groups, with eleven groups on each full line and
-nine on the last. That transcript is preserved as `crypted-en-book.txt`.
+nine on the last. That transcript is preserved as [crypted-en-book.txt](crypted-en-book.txt).
 In particular the scan reads `CMKPA`, `QYXKJ`, `XQPOM`, `RJHVQ`, and `KAUYM`.
 
-The supplied `crypted-book-fragment-en.png` shows the full source passage on
-pages 132–133, including the Programs paragraph of Chapter 27, “Easy Does It,” in
-Charles Wetherell's *Etudes for Programmers* (1978). An accessible
-[transcription of the book](https://tanami.org/archive/Etudes%20for%20Programmers.html)
-contains the source passage under “Compilations” and “Programs.” The encrypted
+The supplied [crypted-book-fragment-en.png](crypted-book-fragment-en.png) shows
+the full source text on pages 132–133, including the Programs paragraph of
+Chapter 27, “Easy Does It,” in Charles Wetherell's *Etudes for Programmers*
+(1978). The encrypted
 message uses STOP for sentence boundaries (including the semicolon after
 “segments”), PARA for the paragraph break, and FINIS for the end. The grammar
 productions between the two prose paragraphs are omitted.
 
-`decrypted-en-source.txt` transcribes only the prose from the supplied fragment
+[decrypted-en-source.txt](decrypted-en-source.txt) transcribes only the prose from the supplied fragment
 (with grammar-angle brackets removed and the line-end word “compiled” joined).
 A letter-by-letter comparison after interpreting those markers has exactly
 one wording difference: the encrypted message says “all **of** the segments,”
@@ -25,7 +24,7 @@ where the source scan says “all the segments.” The corrected ciphertext keep
 that extra OF rather than silently forcing the book's prose wording. Marker
 positions are also recorded in `english-corrections.json`; do not remove every
 substring PARA indiscriminately, because SEPARATED also contains it. The full reconstructed message is a fixture in
-`decrypted-en.txt`; the cracker never reads it.
+[decrypted-en.txt](decrypted-en.txt); the cracker never reads it.
 
 ## Missing ninth line
 
@@ -47,7 +46,7 @@ HASQC WRFTX ETLFY IJGOA AOLAH YQAJO BGXER JHDZX ZHFMV RFGPY YABKY
 ```
 
 Insert this between the printed lines beginning `ZTBCW` and `YMTIK`.
-`crypted-en-restored.txt` does exactly that and changes none of the 595
+[crypted-en-restored.txt](crypted-en-restored.txt) does exactly that and changes none of the 595
 printed letters. Its literal decryption is `decrypted-en-restored.txt`.
 Both the corrected and this minimally restored ciphertext independently
 recover the key and alphabet in the Zig integration tests.
@@ -60,7 +59,7 @@ phase, continuation, and re-encryption all agree with this reconstruction.
 ## Remaining printed-letter anomalies
 
 The minimally restored version decrypts to several misspellings, including
-ACOMPIEATION and SVGMENT. `crypted-en.txt` is the corrected reading edition:
+ACOMPIEATION and SVGMENT. [crypted-en.txt](crypted-en.txt) is the corrected reading edition:
 it contains the missing line and the following **16 explicit substitutions**,
 corresponding to the source passage and the spelled-out terminator FINIS.
 They are editorial corrections, not changes silently made by the cracker.
