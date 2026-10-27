@@ -29,6 +29,11 @@ program locates `data/ru/crypted-ru.txt` from the repository root or this direct
 It prints the period, keyword, mixed alphabet and entire literal plaintext in
 the common output format. Input errors exit with status 1.
 
+For a word-spaced reading of the sample, see
+[decrypted-ru-words.txt](../data/ru/decrypted-ru-words.txt), wrapped at 80
+characters. It preserves every decrypted letter, including the `ЧТЙ` anomaly;
+it is a reading aid, not an input to the cracker.
+
 ## Test
 
 ```sh

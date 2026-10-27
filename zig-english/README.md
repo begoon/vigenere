@@ -21,6 +21,11 @@ Output has the same period/key/alphabet/plaintext format as the Russian solver.
 Use ReleaseFast for searches. Recovery is heuristic, especially on short text,
 non-word keys, unusual language, and ciphertext with missing sections.
 
+For a word-spaced reading of the sample, see
+[decrypted-en-words.txt](../data/en/decrypted-en-words.txt), wrapped at 80
+characters. It preserves all 650 decrypted letters and the ending `FINI HARI`;
+it is a reading aid, not an input to the cracker.
+
 ## Attack
 
 Encryption is `c[i] = B[(p[i] + key[i % period]) % 26]`, with an unknown

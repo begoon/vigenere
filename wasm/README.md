@@ -27,6 +27,12 @@ Its output matches the other implementations exactly; errors exit with status 1.
 Inputs are limited to 32 KiB of UTF-8 and 4,096 Russian letters to bound browser
 resource use. Grouping, punctuation, non-Russian characters, and Ё are ignored.
 
+Word-spaced readings of the supplied samples are available in
+[decrypted-en-words.txt](../data/en/decrypted-en-words.txt) and
+[decrypted-ru-words.txt](../data/ru/decrypted-ru-words.txt). Both are wrapped at
+80 characters and preserve every decrypted letter. They are reading aids,
+not inputs to the solvers.
+
 ## Tests and benchmarks
 
 ```sh

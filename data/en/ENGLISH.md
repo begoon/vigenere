@@ -25,6 +25,10 @@ that extra OF rather than silently forcing the book's prose wording. Marker
 positions are also recorded in `english-corrections.json`; do not remove every
 substring PARA indiscriminately, because SEPARATED also contains it. The full reconstructed message is a fixture in
 [decrypted-en.txt](decrypted-en.txt); the cracker never reads it.
+For the same message split into words and wrapped at 80 characters, see
+[decrypted-en-words.txt](decrypted-en-words.txt). It preserves all 650 letters,
+including STOP, PARA, and the final FINI HARI; only whitespace is added.
+
 
 ## Missing ninth line
 

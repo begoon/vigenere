@@ -57,7 +57,9 @@ Decrypted text:
 
 The programs print the entire plaintext without spaces. The complete expected
 result is [`data/ru/decrypted-ru.txt`](data/ru/decrypted-ru.txt); it is a test fixture,
-not an input to the attack.
+not an input to the attack. Word-spaced readings, wrapped at 80 characters,
+are available for [Russian](data/ru/decrypted-ru-words.txt) and
+[English](data/en/decrypted-en-words.txt); both preserve every decrypted letter.
 
 ## Cipher model
 
@@ -261,12 +263,14 @@ Puzzle assets are grouped by language in [`data/ru/`](data/ru/) and
 | --- | --- |
 | [crypted-ru.txt](data/ru/crypted-ru.txt) | Russian ciphertext used by all implementations |
 | [decrypted-ru.txt](data/ru/decrypted-ru.txt) | Golden expected plaintext, used only for validation |
+| [decrypted-ru-words.txt](data/ru/decrypted-ru-words.txt) | Russian plaintext split into words and wrapped at 80 characters; all decrypted letters preserved |
 | [anomaly-ru.png](data/ru/anomaly-ru.png) | Image documenting the suspected transcription error |
 | [crypted-en.txt](data/en/crypted-en.txt) | Reconstructed and corrected English ciphertext, used by Zig English and the web app |
 | [crypted-en-book.txt](data/en/crypted-en-book.txt) | Exact 595-letter transcript of the reference scan |
 | [crypted-en.png](data/en/crypted-en.png) | Reference scan of the printed English ciphertext |
 | [crypted-en-restored.txt](data/en/crypted-en-restored.txt) | Missing line inserted; all printed letters preserved |
 | [decrypted-en.txt](data/en/decrypted-en.txt) | Corrected English plaintext fixture; not a solver input |
+| [decrypted-en-words.txt](data/en/decrypted-en-words.txt) | English plaintext split into words and wrapped at 80 characters; all decrypted letters preserved |
 | [decrypted-en-restored.txt](data/en/decrypted-en-restored.txt) | Literal plaintext of the minimally restored book message |
 | [crypted-book-fragment-en.png](data/en/crypted-book-fragment-en.png) | Source plaintext scan, pages 132–133; grammar is skipped in the message |
 | [decrypted-en-source.txt](data/en/decrypted-en-source.txt) | Prose-only transcription for the source comparison |

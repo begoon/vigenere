@@ -40,6 +40,12 @@ Open <http://localhost:8000>. Use HTTP rather than opening `index.html` as a
   `DecompressionStream` are supported. If the dictionary fails to load or
   decompress, the literal cracking result is still displayed.
 
+Word-spaced readings of the supplied samples are available in
+[decrypted-en-words.txt](../data/en/decrypted-en-words.txt) and
+[decrypted-ru-words.txt](../data/ru/decrypted-ru-words.txt). Both are wrapped at
+80 characters and preserve every decrypted letter. They are reading aids,
+not inputs to the solvers.
+
 Cracking is heuristic, especially for short or unusual inputs. Word spacing
 uses a unigram frequency model with dynamic programming and, for Russian, a general
 `-овать`/`-ировать` inflection fallback. It adds only spaces: it does not repair
