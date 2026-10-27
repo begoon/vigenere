@@ -27,7 +27,7 @@ const Rng = struct {
 };
 
 // Invalid UTF-8 bytes, grouping, punctuation and Ё are ignored, as in Go.
-fn normalize(a: Allocator, bytes: []const u8) ![]usize {
+pub fn normalize(a: Allocator, bytes: []const u8) ![]usize {
     var out: std.ArrayList(usize) = .empty;
     errdefer out.deinit(a);
     var i: usize = 0;
@@ -70,7 +70,7 @@ fn indexOfCoincidence(cipher: []const usize, period: usize) f64 {
     }
     return total / @as(f64, @floatFromInt(period));
 }
-fn findPeriod(cipher: []const usize) usize {
+pub fn findPeriod(cipher: []const usize) usize {
     var best: usize = 1;
     var best_ic: f64 = 0;
     for (1..@min(20, cipher.len / 20) + 1) |p| {
@@ -84,10 +84,10 @@ fn findPeriod(cipher: []const usize) usize {
     return best;
 }
 
-const Scores = struct {
+pub const Scores = struct {
     tri: []f64,
     quad: []f64,
-    fn init(a: Allocator) !Scores {
+    pub fn init(a: Allocator) !Scores {
         const tri = try loadTable(a, @embedFile("tri.txt"), 3, 0.05);
         errdefer a.free(tri);
         return .{ .tri = tri, .quad = try loadTable(a, @embedFile("quad.txt"), 4, 0.02) };
@@ -131,7 +131,7 @@ fn loadTable(a: Allocator, data: []const u8, size: usize, smoothing: f64) ![]f64
 fn decode(cipher: []const usize, mapping: []const usize, shifts: []const usize, plain: []usize) void {
     for (cipher, 0..) |c, i| plain[i] = (mapping[c] + 32 - shifts[i % shifts.len]) % 32;
 }
-const Solution = struct {
+pub const Solution = struct {
     score: f64 = -std.math.inf(f64),
     mapping: [32]usize = undefined,
     shifts: []usize,
@@ -203,7 +203,12 @@ fn refreshScores(plain: []const usize, cached: []f64, scores: Scores) f64 {
 fn updatePositions(plan: MutationPlan, cipher: []const usize, columns: []const usize, mapping: []const usize, shifts: []const usize, plain: []usize) void {
     for (plan.positions) |i| plain[i] = (mapping[cipher[i]] + 32 - shifts[columns[i]]) % 32;
 }
-fn crack(a: Allocator, cipher: []const usize, period: usize, scores: Scores) !Solution {
+pub fn crack(a: Allocator, cipher: []const usize, period: usize, scores: Scores) !Solution {
+    return crackWithProgress(a, cipher, period, scores, null);
+}
+
+// Optional host callback; native and WebAssembly use the same search.
+pub fn crackWithProgress(a: Allocator, cipher: []const usize, period: usize, scores: Scores, progress: ?*const fn (u32) void) !Solution {
     var arena = std.heap.ArenaAllocator.init(a);
     defer arena.deinit();
     const scratch = arena.allocator();
@@ -217,7 +222,8 @@ fn crack(a: Allocator, cipher: []const usize, period: usize, scores: Scores) !So
     errdefer a.free(best.plain);
     const shifts = try scratch.alloc(usize, period);
     const plain = try scratch.alloc(usize, cipher.len);
-    for (0..48) |_| {
+    for (0..48) |restart| {
+        if (progress) |notify| notify(@intCast(restart));
         var mapping = random.permutation();
         shifts[0] = 0;
         for (shifts[1..]) |*x| x.* = random.n(32);
@@ -270,9 +276,10 @@ fn crack(a: Allocator, cipher: []const usize, period: usize, scores: Scores) !So
             }
         }
     }
+    if (progress) |notify| notify(48);
     return best;
 }
-fn chooseKeyRotation(s: Solution, scores: Scores) usize {
+pub fn chooseKeyRotation(s: Solution, scores: Scores) usize {
     var best: usize = 0;
     var best_score = -std.math.inf(f64);
     var candidate: [20]usize = undefined;

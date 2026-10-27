@@ -5,3 +5,5 @@ zig/.zig-cache/
 zig/zig-out/
 go/vigenerecrack
 vlang/vigenerecrack
+wasm/.zig-cache/
+wasm/zig-out/

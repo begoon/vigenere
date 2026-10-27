@@ -51,6 +51,11 @@ mutation plans use a search-local arena; best-solution buffers are reused.
 Arithmetic remains strict in ReleaseFast; floating-point library differences
 can nevertheless change the annealing trajectory across languages/platforms.
 
+The [WebAssembly target](../wasm/README.md) imports this solver directly.
+`crackWithProgress` accepts an optional callback after each completed restart;
+the native `crack` entry point uses no callback. Rebuild the web binary with
+`bun wasm/build.js` from the repository root after changes to the solver.
+
 `tri.txt` and `quad.txt` are aggregate model counts embedded at compile time.
 They have the same format and contents as Go's and V's files. Update all copies
 together; Go and V tests verify that they remain identical.
