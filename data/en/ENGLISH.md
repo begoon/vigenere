@@ -30,6 +30,20 @@ For the same message split into words and wrapped at 80 characters, see
 including STOP, PARA, and the final FINI HARI; only whitespace is added.
 
 
+## Visual comparison
+
+The left panel reproduces the original ciphertext transcript and its line
+breaks. The right panel shows the corrected reconstruction. Red boxes mark
+the 15 changed letters on both sides and the recovered 55-letter line on the
+right. The final group PKYSK remains unchanged.
+
+![Original and corrected English ciphertext, with changed letters and the restored line boxed in red](crypted-en-comparison.png)
+
+[Open the full-resolution PNG](crypted-en-comparison.png) or the
+[scalable SVG](crypted-en-comparison.svg). The
+[rendering script](../../scripts/render_english_comparison.py) builds the SVG
+from the ciphertext files and correction audit, checking every changed letter.
+
 ## Missing ninth line
 
 After eight lines (440 letters), one full 55-letter line is missing. The

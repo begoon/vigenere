@@ -22,7 +22,8 @@ transcript and minimally restored version are retained.
 **An interesting story behind the original print:** the book's English puzzle
 has an entire missing line, printed typos, and a signed ending that is easy
 to misread. Read [how we reconstructed the original message](data/en/ENGLISH.md),
-with scans, the recovered line, and a correction-by-correction audit.
+with scans, the recovered line, a correction-by-correction audit, and a
+[side-by-side visual comparison](data/en/crypted-en-comparison.png).
 
 ## Running the implementations
 
