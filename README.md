@@ -16,12 +16,12 @@ There is no hardcoded plaintext phrase or keyword dictionary in the solver.
 The [English cracker](zig-english/README.md) is implemented only in Zig,
 with its own English language model and a Wasm build. The web app switches
 between Russian and English. The English example reconstructs a missing
-55-letter line and explicitly corrects 16 printed letters; the original scan
+55-letter line and explicitly corrects 15 printed letters; the original scan
 transcript and minimally restored version are retained.
 
 **An interesting story behind the original print:** the book's English puzzle
-has an entire missing line, printed typos, and an unexplained suffix after the
-end marker. Read [how we reconstructed the original message](data/en/ENGLISH.md),
+has an entire missing line, printed typos, and a signed ending that is easy
+to misread. Read [how we reconstructed the original message](data/en/ENGLISH.md),
 with scans, the recovered line, and a correction-by-correction audit.
 
 ## Running the implementations
@@ -285,9 +285,8 @@ These problems are present in the printed source, not introduced by our transcri
 - One **55-letter line** is missing between the lines beginning `ZTBCW` and
   `YMTIK`. Restoring it brings the ciphertext from 595 to 650 letters and
   restores the repeating key's alignment for the rest of the message.
-- **16 printed letters** decrypt incorrectly when compared with the
-  [source prose](data/en/crypted-book-fragment-en.png) and the expected `FINIS`
-  end marker. Their corrections are inferred from the intended plaintext;
+- **15 printed letters** decrypt incorrectly when compared with the
+  [source prose](data/en/crypted-book-fragment-en.png). Their corrections are inferred from the intended plaintext;
   they are documented editorial corrections, not an independently verified errata list.
 
 The three ciphertext files deliberately preserve different stages:
@@ -296,17 +295,19 @@ The three ciphertext files deliberately preserve different stages:
 | --- | --- | --- | ---: |
 | [crypted-en-book.txt](data/en/crypted-en-book.txt) | Still missing | Preserved | 595 |
 | [crypted-en-restored.txt](data/en/crypted-en-restored.txt) | Restored | Preserved | 650 |
-| [crypted-en.txt](data/en/crypted-en.txt) | Restored | 16 letters corrected | 650 |
+| [crypted-en.txt](data/en/crypted-en.txt) | Restored | 15 letters corrected | 650 |
 
 **`crypted-en-restored.txt` still contains the book's printed typos.
-`crypted-en.txt` has those 16 errors fixed.** The two files differ at exactly
-16 positions. The English cracker and web app use `crypted-en.txt` by default;
+`crypted-en.txt` has those 15 errors fixed.** The two files differ at exactly
+15 positions. The English cracker and web app use `crypted-en.txt` by default;
 the cracker itself does not insert the missing line or silently fix letters.
 
 The missing line was reconstructed using the source passage and checked by
 re-encryption; absent ciphertext cannot be uniquely recovered from ciphertext
 alone. See the [reconstruction audit](data/en/ENGLISH.md) for the recovered
-line, every correction, and the unexplained `ARI` suffix after `FINIS`.
+line, every correction, and the ending `FINI HARI`: an end marker followed
+by the signature of Miss Hari, the spy introduced in Chapter 24. The literal
+`FINIHARI` is preserved; it is not a printing error.
 
 ### Russian: suspected transcription error
 

@@ -607,7 +607,7 @@ test "independent prose and a different key and permutation" {
     try std.testing.expectEqualSlices(usize, expected, answer.plain);
 }
 
-test "reconstruction preserves the scan except for the documented gap and 16 corrections" {
+test "reconstruction preserves the scan except for the documented gap and 15 corrections" {
     const a = std.testing.allocator;
     const book = try readTestFixture("../data/en/crypted-en-book.txt");
     defer a.free(book);
@@ -626,7 +626,8 @@ test "reconstruction preserves the scan except for the documented gap and 16 cor
     for (corrected, restored) |x, y| {
         if (x != y) differences += 1;
     }
-    try std.testing.expectEqual(@as(usize, 16), differences);
+    try std.testing.expectEqual(@as(usize, 15), differences);
+    try std.testing.expectEqualSlices(usize, book[book.len - 5 ..], corrected[corrected.len - 5 ..]);
     const key = try normalize(a, "COMPILE");
     defer a.free(key);
     const alphabet = try normalize(a, "EXACRBTIONDFGWVYZHJKLMPQUS");
@@ -655,14 +656,14 @@ test "source prose agrees apart from encrypted OF and punctuation markers" {
         .{ .start = 290, .len = 4 },
         .{ .start = 352, .len = 4 },
         .{ .start = 473, .len = 4 },
-        .{ .start = 642, .len = 5 },
+        .{ .start = 642, .len = 4 },
     };
     var start: usize = 0;
     for (markers) |marker| {
         try prose.appendSlice(a, plain[start..marker.start]);
         start = marker.start + marker.len;
     }
-    const suffix = try normalize(a, "ARI");
+    const suffix = try normalize(a, "HARI");
     defer a.free(suffix);
     try std.testing.expectEqualSlices(usize, suffix, plain[start..]);
     try std.testing.expectEqualSlices(usize, source[0..106], prose.items[0..106]);

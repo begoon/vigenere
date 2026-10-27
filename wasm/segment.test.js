@@ -30,7 +30,7 @@ test("vendored Russian dictionary preserves the golden text and recognizes techn
   expect(words).toContain(" ВСЕ ЧТЙ ОБЫЧНО ");
 });
 
-test("English word spacing preserves the literal message and unknown suffix", async () => {
+test("English word spacing preserves the literal message and signature", async () => {
   const data = await Bun.file(new URL("../docs/en-frequency.txt.gz", import.meta.url)).arrayBuffer();
   const segment = createSegmenter(gunzipSync(data).toString(), "en");
   const plain = (await Bun.file(new URL("../data/en/decrypted-en.txt", import.meta.url)).text()).trim();

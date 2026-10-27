@@ -66,6 +66,7 @@ integration("English search returns all 650 fixture letters and supports reuse",
   expect(result.keyword).toBe("COMPILE");
   expect(result.alphabet).toBe("EXACRBTIONDFGWVYZHJKLMPQUS");
   expect(result.plaintext).toBe(plain);
+  expect(result.plaintext).toEndWith("FINIHARI");
   expect(progress.at(-1)).toBe(1);
   expect(progress.every((x, i) => !i || x >= progress[i - 1])).toBe(true);
   const short = crack("a");

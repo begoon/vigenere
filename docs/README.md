@@ -25,9 +25,9 @@ Open <http://localhost:8000>. Use HTTP rather than opening `index.html` as a
   input validation, Zig Wasm solvers, and word-spacing dictionaries. English is
   the initial selection. A switch clears previous results; it is disabled while
   a search is running. Cancel first to switch during a search.
-- The English sample has its missing line restored and 16 printed letters
+- The English sample has its missing line restored and 15 printed letters
   corrected, as explicitly explained beside the selector and in the
-  [data audit](../data/en/ENGLISH.md). The final ARI is preserved.
+  [data audit](../data/en/ENGLISH.md). The ending FINI HARI (end marker and signature) is preserved.
 - The selected ciphertext is loaded into an editable textarea.
 - **Crack the cipher** runs the shared Zig Wasm solver in a dedicated worker.
 - Progress reflects completed restarts. **Cancel** terminates the worker;

@@ -13,7 +13,7 @@ the full source text on pages 132–133, including the Programs paragraph of
 Chapter 27, “Easy Does It,” in Charles Wetherell's *Etudes for Programmers*
 (1978). The encrypted
 message uses STOP for sentence boundaries (including the semicolon after
-“segments”), PARA for the paragraph break, and FINIS for the end. The grammar
+“segments”), PARA for the paragraph break, and FINI for the end. The grammar
 productions between the two prose paragraphs are omitted.
 
 [decrypted-en-source.txt](decrypted-en-source.txt) transcribes only the prose from the supplied fragment
@@ -60,8 +60,8 @@ phase, continuation, and re-encryption all agree with this reconstruction.
 
 The minimally restored version decrypts to several misspellings, including
 ACOMPIEATION and SVGMENT. [crypted-en.txt](crypted-en.txt) is the corrected reading edition:
-it contains the missing line and the following **16 explicit substitutions**,
-corresponding to the source passage and the spelled-out terminator FINIS.
+it contains the missing line and the following **15 explicit substitutions**,
+corresponding to the source passage. The ending FINI HARI needs no correction.
 They are editorial corrections, not changes silently made by the cracker.
 Positions are one-based in the **restored 650-letter** message; line/group/letter
 use eleven groups of five per line. The machine-readable audit is
@@ -84,13 +84,19 @@ use eleven groups of five per line. The machine-readable audit is
 | 557 | 11/2/2 | Y → T | A → R |
 | 572 | 11/5/2 | C → G | V → E |
 | 601 | 11/11/1 | A → S | R → O |
-| 647 | 12/9/2 | K → R | H → S |
 
-After correcting FINIH to FINIS, the last three decrypted letters are still
-**ARI**. They occur after the FINIS end marker, outside the message proper.
-They may be padding, but their purpose is unverified. They are retained
-literally in every relevant fixture and in browser output, not removed or
-reinterpreted. Five-letter grouping is also preserved (650 letters total).
+## The ending: FINI HARI
+
+The literal ending is **FINIHARI**, naturally read as **FINI HARI**:
+FINI is French for “finished” and serves as the end marker; HARI is the
+signature of Miss Hari, the French-speaking spy introduced in Chapter 24,
+“A Code of Dishonor.” STOP is the ordinary period marker.
+
+This ending is not a typo or unexplained padding. Do not change FINIH to
+FINIS: the H begins HARI. The final ciphertext group stays **PKYSK**, exactly
+as printed, in both the restored and corrected editions. All 650 letters
+are retained. The prose scan contains the compiler passage; the signature's
+context comes from Chapter 24's story.
 
 ## Reproduce the checks
 
@@ -106,6 +112,6 @@ diff ../data/en/crypted-en.txt /tmp/reconstructed-en.txt
 
 The audit verifies that removing offsets 440–494 from the minimally restored
 file reproduces every original scan-transcript letter, that the corrected
-edition differs at exactly 16 positions, and that encryption reproduces the
+edition differs at exactly 15 positions, and that encryption reproduces the
 entire corrected ciphertext. The search tests separately verify literal
 plaintext recovery rather than merely checking that the output looks English.

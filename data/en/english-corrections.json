@@ -152,16 +152,6 @@
       "corrected": "S",
       "literal_plaintext": "R",
       "corrected_plaintext": "O"
-    },
-    {
-      "position": 647,
-      "line": 12,
-      "group": 9,
-      "letter": 2,
-      "printed": "K",
-      "corrected": "R",
-      "literal_plaintext": "H",
-      "corrected_plaintext": "S"
     }
   ],
   "markers": [
@@ -191,8 +181,8 @@
     },
     {
       "position": 643,
-      "text": "FINIS"
+      "text": "FINI"
     }
   ],
-  "post_finis_suffix": "ARI"
+  "signature": "HARI"
 }
