@@ -1,0 +1,46 @@
+:root { color-scheme: light; --paper: #f3f1e9; --ink: #232c28; --muted: #687069; --line: #d6d9ce; --green: #274f40; --accent: #dcebbf; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { width: 100%; margin: 0 auto; padding: 24px 24px 18px; }
+header { padding-bottom: 22px; }
+.eyebrow { display: flex; align-items: center; gap: 13px; font-size: 11px; font-weight: 650; letter-spacing: .13em; }
+.mark { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--green); font: 24px Georgia, serif; }
+.edition { margin-left: auto; color: var(--muted); font-size: 10px; }
+h1 { margin: 24px 0 10px; font: 500 clamp(40px, 6vw, 66px)/1.04 Georgia, "Times New Roman", serif; letter-spacing: -.04em; }
+.intro { font-size: 16px; line-height: 1.65; color: var(--muted); margin: 0; }
+.panel { background: #fcfcf7; border: 1px solid var(--line); border-radius: 5px; padding: 18px 20px; margin-bottom: 12px; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+h2 { margin: 0; font-size: 16px; font-weight: 600; }
+h2 span { color: var(--muted); font: 12px ui-monospace, monospace; margin-right: 12px; }
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: default; opacity: .45; }
+.text-button { border: 0; background: none; color: var(--green); padding: 5px 0; font-size: 12px; white-space: nowrap; }
+textarea { display: block; width: 100%; min-height: 240px; resize: none; overflow-y: hidden; border: 1px solid var(--line); border-radius: 3px; background: #f7f8f1; padding: 12px; color: var(--ink); font: 13px/1.85 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .035em; }
+textarea::placeholder { color: #8b9188; letter-spacing: 0; }
+textarea:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid #82a465; outline-offset: 3px; }
+.input-meta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 11px; margin: 8px 0 12px; }
+.input-meta p { margin: 0; }
+#letter-count { white-space: nowrap; }
+.action-row { display: flex; align-items: center; gap: 12px; }
+.primary { border: 0; border-radius: 3px; background: var(--green); color: white; padding: 12px 18px; font-size: 14px; font-weight: 550; white-space: nowrap; }
+.primary span { margin-left: 24px; }
+.primary:hover { background: #183b2e; }
+.secondary { background: none; border: 1px solid var(--line); border-radius: 3px; padding: 10px; font-size: 12px; }
+#status { font-size: 12px; line-height: 1.5; color: var(--muted); margin: 0; }
+#status.error { color: #a43329; }
+progress { width: 100%; height: 6px; margin-top: 12px; accent-color: var(--green); }
+.key-panel { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--accent); padding: 16px 20px; margin-bottom: 12px; border-radius: 5px; }
+.key-panel h2 { color: var(--green); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px; }
+#keyword { display: block; font: 35px Georgia, serif; letter-spacing: .09em; color: var(--green); overflow-wrap: anywhere; }
+.key-details { font-size: 11px; color: var(--green); min-width: 0; }
+.key-details p { margin: 0 0 6px; }
+#alphabet-label { opacity: .7; margin-top: 8px; }
+#alphabet { font: 12px ui-monospace, monospace; overflow-wrap: anywhere; }
+.caption { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 0 0 10px; max-width: 740px; }
+#words { font: 16px/1.8 Georgia, "Times New Roman", serif; letter-spacing: .01em; }
+footer { color: var(--muted); font-size: 11px; line-height: 1.7; padding: 4px 0 10px; }
+footer p { margin: 6px 0; }
+footer a { color: inherit; text-underline-offset: 3px; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+@media (max-width: 640px) { main { padding: 16px 12px; } .edition { display: none; } h1 { margin-top: 20px; } .panel { padding: 14px 12px; } .input-meta { flex-direction: column; gap: 6px; } .action-row { flex-wrap: wrap; } #status { flex-basis: 100%; } .key-panel { align-items: flex-start; flex-direction: column; gap: 12px; padding: 16px; } textarea { min-height: 240px; font-size: 12px; } .key-details { width: 100%; } }

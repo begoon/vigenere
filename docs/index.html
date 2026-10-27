@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f1e9">
+  <meta name="description" content="Recover the keyword and plaintext of a Russian mixed-alphabet Vigenère cipher, entirely in your browser.">
+  <title>Vigenère · Cipher notebook</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="eyebrow"><span class="mark">В</span> ETUDES FOR PROGRAMMERS <span class="edition">CIPHER NOTEBOOK / 01</span></div>
+      <h1>Find the words inside the cipher.</h1>
+      <p class="intro">An unknown alphabet. A repeating key. Recover both from a Russian Vigenère ciphertext, right here in your browser.</p>
+    </header>
+
+    <section class="panel input-panel" aria-labelledby="input-title">
+      <div class="section-heading"><h2 id="input-title"><span>01</span> The ciphertext</h2><button class="text-button" id="sample" type="button">Load example ↗</button></div>
+      <label class="sr-only" for="ciphertext">Russian ciphertext</label>
+      <textarea id="ciphertext" lang="ru" spellcheck="false" aria-describedby="input-help" placeholder="Loading the Russian example…"></textarea>
+      <div class="input-meta"><p id="input-help">Russian letters А–Я · spacing is ignored · up to 4,096 letters</p><span id="letter-count">0 letters</span></div>
+      <div class="action-row"><button class="primary" id="crack" type="button">Crack the cipher <span aria-hidden="true">→</span></button><button id="cancel" class="secondary" type="button" hidden>Cancel</button><p id="status" role="status" aria-live="polite">Ready when you are.</p></div>
+      <progress id="progress" max="1" value="0" aria-label="Search progress" hidden></progress>
+    </section>
+
+    <section class="key-panel" aria-labelledby="key-title">
+      <div><h2 id="key-title">Recovered keyword</h2><output id="keyword" lang="ru">—</output></div>
+      <div class="key-details"><p id="period">Waiting for a discovery</p><p id="alphabet-label">Mixed alphabet</p><output id="alphabet" lang="ru">—</output></div>
+    </section>
+
+    <section class="panel" aria-labelledby="group-title">
+      <div class="section-heading"><h2 id="group-title"><span>02</span> The decrypted letters</h2><button class="text-button copy" data-copy="grouped" disabled>Copy ↗</button></div>
+      <p class="caption">The literal result, arranged in the original five-letter groups.</p>
+      <label class="sr-only" for="grouped">Decrypted text in five-letter groups</label>
+      <textarea id="grouped" lang="ru" readonly spellcheck="false" placeholder="Your decrypted text will appear here."></textarea>
+    </section>
+
+    <section class="panel" aria-labelledby="words-title">
+      <div class="section-heading"><h2 id="words-title"><span>03</span> Put the words back</h2><button class="text-button copy" data-copy="words" disabled>Copy ↗</button></div>
+      <p class="caption">Estimated word boundaries from Russian word frequencies. Every decrypted letter is preserved; unusual words and transcription errors can produce imperfect spacing.</p>
+      <label class="sr-only" for="words">Decrypted text with estimated Russian words</label>
+      <textarea id="words" lang="ru" readonly spellcheck="false" placeholder="A reading with estimated word spacing will appear here."></textarea>
+    </section>
+
+    <footer><p>All computation stays in your browser. Recovery is a statistical search, so results on other ciphertexts may vary.</p><p>Word frequencies: <a href="https://github.com/hermitdave/FrequencyWords">Hermit Dave / OpenSubtitles 2018</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> · <a href="THIRD_PARTY.md">Data credits</a></p></footer>
+  </main>
+</body>
+</html>
