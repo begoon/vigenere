@@ -7,3 +7,5 @@ go/vigenerecrack
 vlang/vigenerecrack
 wasm/.zig-cache/
 wasm/zig-out/
+zig-english/.zig-cache/
+zig-english/zig-out/
