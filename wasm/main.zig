@@ -1,5 +1,8 @@
 const std = @import("std");
 const solver = @import("solver");
+const english = @import("build_options").english;
+const alphabet_size = if (english) 26 else 32;
+const letter_bytes = if (english) 1 else 2;
 
 extern "env" fn progress(completed: u32) void;
 fn notify(completed: u32) void {
@@ -35,8 +38,19 @@ export fn alphabet_ptr() [*]const u8 {
     return &alphabet;
 }
 
+export fn alphabet_len() usize {
+    return alphabet_size * letter_bytes;
+}
+export fn keyword_len() usize {
+    return period * letter_bytes;
+}
+
 fn encode(values: []const usize, out: []u8) void {
     for (values, 0..) |value, i| {
+        if (english) {
+            out[i] = @intCast('A' + value);
+            continue;
+        }
         const cp: u16 = @intCast('А' + value);
         out[i * 2] = @intCast(0xc0 | (cp >> 6));
         out[i * 2 + 1] = @intCast(0x80 | (cp & 63));
@@ -54,14 +68,14 @@ fn solve(len: usize) !void {
     const answer = try solver.crackWithProgress(a, cipher, found_period, scores, notify);
     const rotation = solver.chooseKeyRotation(answer, scores);
     var key: [20]usize = undefined;
-    for (answer.shifts, 0..) |value, i| key[i] = (value + rotation) % 32;
-    var mixed: [32]usize = undefined;
-    for (answer.mapping, 0..) |pos, letter| mixed[(pos + rotation) % 32] = letter;
+    for (answer.shifts, 0..) |value, i| key[i] = (value + rotation) % alphabet_size;
+    var mixed: [alphabet_size]usize = undefined;
+    for (answer.mapping, 0..) |pos, letter| mixed[(pos + rotation) % alphabet_size] = letter;
     encode(key[0..found_period], &keyword);
     encode(&mixed, &alphabet);
     encode(answer.plain, &plaintext);
     period = found_period;
-    plain_len = cipher.len * 2;
+    plain_len = cipher.len * letter_bytes;
 }
 
 // Results remain valid until the next call. No allocation crosses the ABI.
@@ -71,7 +85,7 @@ export fn crack(len: usize) u32 {
     plain_len = 0;
     if (len > input.len) return 2;
     solve(len) catch |err| return switch (err) {
-        error.NoRussianLetters => 1,
+        (if (english) error.NoEnglishLetters else error.NoRussianLetters) => 1,
         error.TooLong => 2,
         else => 3,
     };

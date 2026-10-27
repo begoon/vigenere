@@ -56,3 +56,18 @@ valid until the next call. `docs/solver.js` owns the shared JS adapter.
 See [`docs/README.md`](../docs/README.md). The committed `docs/vigenere.wasm`
 is intentional: GitHub Pages can serve the site without running Zig or Bun.
 Rebuild it whenever the shared solver or Wasm wrapper changes.
+
+## English
+
+The same build also produces `docs/vigenere-en.wasm`, importing
+`zig-english/main.zig`. Both variants share the wrapper and export byte lengths
+for the keyword and alphabet so ASCII and Cyrillic outputs are read correctly.
+
+```sh
+bun wasm/build.js
+bun wasm/cli.js --english
+VIGENERE_INTEGRATION=1 bun test wasm
+```
+
+The optional filename follows `--english`. English model provenance and the
+reconstruction are documented in `zig-english/README.md` and `data/en/ENGLISH.md`.

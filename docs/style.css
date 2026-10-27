@@ -44,3 +44,8 @@ footer a { color: inherit; text-underline-offset: 3px; }
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 @media (max-width: 640px) { main { padding: 16px 12px; } .edition { display: none; } h1 { margin-top: 20px; } .panel { padding: 14px 12px; } .input-meta { flex-direction: column; gap: 6px; } .action-row { flex-wrap: wrap; } #status { flex-basis: 100%; } .key-panel { align-items: flex-start; flex-direction: column; gap: 12px; padding: 16px; } textarea { min-height: 240px; font-size: 12px; } .key-details { width: 100%; } }
+
+.language-choice { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+.language-choice label { font-weight: 600; }
+.language-choice select { font: inherit; color: inherit; background: transparent; border: 1px solid currentColor; border-radius: 4px; padding: .5rem 2rem .5rem .75rem; }
+.edition-note { font-size: .9rem; line-height: 1.6; max-width: 70ch; margin: 0 0 1.5rem; }

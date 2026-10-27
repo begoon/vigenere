@@ -8,7 +8,11 @@ export function groupLetters(text, groupsPerLine = 11) {
 }
 
 // Unigram Viterbi segmentation. Unknown letters remain literal, never corrected.
-export function createSegmenter(data) {
+export function createSegmenter(data, language = "ru") {
+  if (!["ru", "en"].includes(language)) throw new Error("Unsupported language.");
+  const english = language === "en";
+  const alphabet = english ? /^[A-Z]+$/ : /^[А-Я]+$/;
+  const singles = english ? "AI" : "АВИКОСУЯ";
   const frequencies = new Map();
   let total = 0;
   let maxLength = 1;
@@ -17,17 +21,17 @@ export function createSegmenter(data) {
     if (!raw) continue;
     const word = raw.toUpperCase().replaceAll("Ё", "Е");
     const count = Number(countText);
-    if (!/^[А-Я]+$/.test(word) || !Number.isFinite(count) || count <= 0) continue;
-    if (word.length === 1 && !"АВИКОСУЯ".includes(word)) continue;
+    if (!alphabet.test(word) || !Number.isFinite(count) || count <= 0) continue;
+    if (word.length === 1 && !singles.includes(word)) continue;
     frequencies.set(word, (frequencies.get(word) || 0) + count);
     total += count;
     maxLength = Math.max(maxLength, word.length);
   }
-  if (!total) throw new Error("The Russian dictionary is empty.");
+  if (!total) throw new Error(`The ${english ? "English" : "Russian"} dictionary is empty.`);
   // Productive forms of -овать/-ировать verbs, including rare technical verbs.
   // This is a general morphology fallback, not a list of expected puzzle words.
   for (const [word, count] of [...frequencies]) {
-    if (!word.endsWith("ОВАТЬ")) continue;
+    if (english || !word.endsWith("ОВАТЬ")) continue;
     const stem = word.slice(0, -3);
     for (const ending of ["АЛ", "АЛА", "АЛО", "АЛИ", "АЛСЯ", "АЛАСЬ", "АЛОСЬ", "АЛИСЬ", "АН", "АНА", "АНО", "АНЫ"]) {
       const form = stem + ending;

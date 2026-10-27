@@ -12,16 +12,17 @@ self.onmessage = async ({ data }) => {
   if (busy) return;
   busy = true;
   try {
-    const bytes = await load("vigenere.wasm", true);
-    const crack = await createSolver(bytes, (progress) => self.postMessage({ type: "progress", progress }));
+    const language = data.language === "en" ? "en" : "ru";
+    const bytes = await load(language === "en" ? "vigenere-en.wasm" : "vigenere.wasm", true);
+    const crack = await createSolver(bytes, (progress) => self.postMessage({ type: "progress", progress }), language);
     const result = crack(data.text);
     // A dictionary failure must not discard a successfully recovered plaintext.
     let words = "";
     let warning = "";
     try {
-      const compressed = await load("ru-frequency.txt.gz", true);
+      const compressed = await load(`${language}-frequency.txt.gz`, true);
       const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream("gzip"));
-      const segment = createSegmenter(await new Response(stream).text());
+      const segment = createSegmenter(await new Response(stream).text(), language);
       words = segment(result.plaintext);
     } catch (error) {
       warning = `Cracking succeeded, but word spacing is unavailable: ${error.message}`;

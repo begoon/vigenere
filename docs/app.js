@@ -2,6 +2,10 @@ const $ = (id) => document.getElementById(id);
 let worker = null;
 let started = 0;
 let sample = "";
+let language = $("language").value;
+let sampleRequest = 0;
+const letterPattern = () => language === "en" ? /[A-Za-z]/g : /[А-Яа-я]/g;
+const languageName = () => language === "en" ? "English" : "Russian";
 function fitTextarea(textarea) {
   const borders = textarea.offsetHeight - textarea.clientHeight;
   textarea.style.height = "auto";
@@ -13,7 +17,7 @@ function fitTextareas() {
 window.addEventListener("resize", fitTextareas);
 document.fonts.ready.then(fitTextareas);
 const count = () => {
-  const letters = ($("ciphertext").value.match(/[А-Яа-я]/g) || []).length;
+  const letters = ($("ciphertext").value.match(letterPattern()) || []).length;
   $("letter-count").textContent = `${letters.toLocaleString()} letters`;
   fitTextarea($("ciphertext"));
 };
@@ -23,6 +27,7 @@ function status(text, error = false) {
 }
 function busy(value) {
   $("crack").disabled = value;
+  $("language").disabled = value;
   $("sample").disabled = value || !sample;
   $("ciphertext").readOnly = value;
   $("cancel").hidden = !value;
@@ -50,9 +55,9 @@ $("sample").addEventListener("click", () => {
 $("cancel").addEventListener("click", () => { finish(); status("Search cancelled. You can try again."); });
 $("crack").addEventListener("click", () => {
   const text = $("ciphertext").value;
-  const letters = (text.match(/[А-Яа-я]/g) || []).length;
+  const letters = (text.match(letterPattern()) || []).length;
   if (!letters || letters > 4096) {
-    status(letters ? "Use at most 4,096 Russian letters." : "Enter some Russian letters to start.", true);
+    status(letters ? `Use at most 4,096 ${languageName()} letters.` : `Enter some ${languageName()} letters to start.`, true);
     return;
   }
   clearResult(); busy(true); $("progress").value = 0;
@@ -78,7 +83,7 @@ $("crack").addEventListener("click", () => {
       }
     };
     worker.onerror = () => { status("The solver could not run. Reload the page and try again.", true); finish(); };
-    worker.postMessage({ text });
+    worker.postMessage({ text, language });
   } catch (error) { status(error.message, true); finish(); }
 });
 for (const button of document.querySelectorAll(".copy")) {
@@ -89,15 +94,38 @@ for (const button of document.querySelectorAll(".copy")) {
     } catch { status("Select the text and copy it with your keyboard."); }
   });
 }
-$("sample").disabled = true;
-try {
-  const response = await fetch(new URL("crypted-ru.txt", import.meta.url));
-  if (!response.ok) throw new Error();
-  sample = (await response.text()).trim();
-  if (!$("ciphertext").value) $("ciphertext").value = sample;
-  $("sample").disabled = !!worker;
-  count();
-} catch {
-  $("ciphertext").placeholder = "Paste Russian ciphertext here.";
-  status("The example could not load. Paste your own ciphertext to continue.", true);
+async function loadLanguage() {
+  const request = ++sampleRequest;
+  language = $("language").value;
+  const selected = language;
+  const name = languageName();
+  sample = "";
+  $("sample").disabled = true;
+  $("ciphertext").value = "";
+  $("ciphertext").placeholder = `Loading the ${name} example…`;
+  for (const id of ["ciphertext", "keyword", "alphabet", "grouped", "words"]) $(id).lang = selected;
+  $("ciphertext-label").textContent = `${name} ciphertext`;
+  $("input-help").textContent = `${name} letters ${selected === "en" ? "A–Z" : "А–Я"} · spacing is ignored · up to 4,096 letters`;
+  $("words-caption").textContent = `Estimated word boundaries from ${name} word frequencies. Every decrypted letter is preserved; unusual words and transcription errors can produce imperfect spacing.`;
+  $("words-label").textContent = `Decrypted text with estimated ${name} words`;
+  $("english-note").hidden = selected !== "en";
+  clearResult(); count();
+  status(`Loading the ${name} example…`);
+  try {
+    const response = await fetch(new URL(`crypted-${selected}.txt`, import.meta.url));
+    if (!response.ok) throw new Error();
+    const loaded = (await response.text()).trim();
+    if (request !== sampleRequest) return;
+    sample = loaded;
+    if (!$("ciphertext").value) $("ciphertext").value = sample;
+    $("sample").disabled = !!worker;
+    count();
+    if (!worker) status("Example loaded. Ready when you are.");
+  } catch {
+    if (request !== sampleRequest) return;
+    $("ciphertext").placeholder = `Paste ${name} ciphertext here.`;
+    if (!worker) status("The example could not load. Paste your own ciphertext to continue.", true);
+  }
 }
+$("language").addEventListener("change", loadLanguage);
+await loadLanguage();

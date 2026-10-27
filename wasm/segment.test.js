@@ -29,3 +29,14 @@ test("vendored Russian dictionary preserves the golden text and recognizes techn
   expect(words).toContain(" КОМПИЛИРОВАЛИСЬ ");
   expect(words).toContain(" ВСЕ ЧТЙ ОБЫЧНО ");
 });
+
+test("English word spacing preserves the literal message and unknown suffix", async () => {
+  const data = await Bun.file(new URL("../docs/en-frequency.txt.gz", import.meta.url)).arrayBuffer();
+  const segment = createSegmenter(gunzipSync(data).toString(), "en");
+  const plain = (await Bun.file(new URL("../data/en/decrypted-en.txt", import.meta.url)).text()).trim();
+  const words = segment(plain);
+  expect(words.replaceAll(" ", "")).toBe(plain);
+  expect(words).toStartWith("A COMPILATION IS A STRING OF SELF CONTAINED PROGRAM SEGMENTS STOP");
+  expect(() => createSegmenter("мама 100", "en")).toThrow("empty");
+  expect(createSegmenter("hello 100\nworld 90\n", "en")("HELLOWORLD")).toBe("HELLO WORLD");
+});

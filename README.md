@@ -1,17 +1,24 @@
 # Cracking a mixed-alphabet Vigenère cipher
 
-This project solves the Russian cipher puzzle from C. Wetherell's *Etudes for
+This project solves the Russian and original English cipher puzzles from C. Wetherell's *Etudes for
 Programmers*. The Vigenère base alphabet is an unknown permutation of the
-32-letter Russian alphabet, without Ё. Both the repeated keyword and the mixed
+32-letter Russian alphabet (without Ё) or the 26-letter English alphabet. Both the repeated keyword and the mixed
 alphabet must be recovered.
 
 Try the [online playground](https://demin.ws/vigenere/) to crack the cipher in your browser.
 
-The [Go](go/README.md), [Zig](zig/README.md), [V](vlang/README.md), and
+The Russian [Go](go/README.md), [Zig](zig/README.md), [V](vlang/README.md), and
 [WebAssembly](wasm/README.md) implementations
 use the same ciphertext-only attack. They share the language
 counts, random generator, search budget, incremental scoring, and output format.
 There is no hardcoded plaintext phrase or keyword dictionary in the solver.
+
+The [English cracker](zig-english/README.md) is implemented only in Zig,
+with its own English language model and a Wasm build. The web app switches
+between Russian and English. The English example reconstructs a missing
+55-letter line and explicitly corrects 16 printed letters; the original scan
+transcript and minimally restored version are retained. See the
+[reconstruction audit](data/en/ENGLISH.md), including the unexplained final ARI.
 
 ## Running the implementations
 
@@ -21,16 +28,17 @@ and tests:
 | Implementation | Requirements | Quick start from repository root |
 | --- | --- | --- |
 | [Go](go/README.md) | Go 1.26+; tested with Go 1.27.1 | `cd go && go run .` |
+| [Zig English](zig-english/README.md) | Zig 0.16.0 | `cd zig-english && zig build run -Doptimize=ReleaseFast` |
 | [Zig](zig/README.md) | Zig 0.16.0 | `cd zig && zig build run -Doptimize=ReleaseFast` |
 | [V](vlang/README.md) | Tested with V 0.5.2 | `cd vlang && v -prod run .` |
 | [Wasm / Bun](wasm/README.md) | Zig 0.16.0; tested with Bun 1.4.2 | `bun wasm/build.js && bun wasm/cli.js` |
 
 The [static web app](docs/README.md) lives in `docs/`, ready for GitHub Pages.
 It runs the Zig Wasm solver in a worker, shows progress and the recovered key,
-and displays both five-letter groups and estimated Russian word spacing.
+and displays both five-letter groups and estimated word spacing in either language.
 Preview with `just web-serve` and open `http://localhost:8000`.
 
-All use [`data/ru/crypted-ru.txt`](data/ru/crypted-ru.txt) by default. An optional
+The Russian implementations use [`data/ru/crypted-ru.txt`](data/ru/crypted-ru.txt) by default. An optional
 filename selects another ciphertext. Russian letters in either case are
 accepted; grouping, punctuation, Ё, and invalid UTF-8 are ignored. Input with
 no Russian letters fails. The supplied ciphertext has 738 letters and yields:
@@ -48,6 +56,9 @@ result is [`data/ru/decrypted-ru.txt`](data/ru/decrypted-ru.txt); it is a test f
 not an input to the attack.
 
 ## Cipher model
+
+The explanation and benchmarks below describe the Russian implementations;
+see [Zig English](zig-english/README.md) for its model and initialization.
 
 Let `A(x)` be the index of letter `x` in the standard alphabet:
 
@@ -239,22 +250,61 @@ opt-in to keep routine tests short.
 
 ## Shared puzzle data and findings
 
-All puzzle assets live in [`data/`](data/):
+Puzzle assets are grouped by language in [`data/ru/`](data/ru/) and
+[`data/en/`](data/en/):
 
 | File | Purpose |
 | --- | --- |
 | [crypted-ru.txt](data/ru/crypted-ru.txt) | Russian ciphertext used by all implementations |
 | [decrypted-ru.txt](data/ru/decrypted-ru.txt) | Golden expected plaintext, used only for validation |
 | [anomaly-ru.png](data/ru/anomaly-ru.png) | Image documenting the suspected transcription error |
-| [crypted-en.txt](data/en/crypted-en.txt) | Separate English ciphertext puzzle |
-| [crypted-book-fragment-en.png](data/en/crypted-book-fragment-en.png) | Original English puzzle image |
+| [crypted-en.txt](data/en/crypted-en.txt) | Reconstructed and corrected English ciphertext, used by Zig English and the web app |
+| [crypted-en-book.txt](data/en/crypted-en-book.txt) | Exact 595-letter transcript of the reference scan |
+| [crypted-en.png](data/en/crypted-en.png) | Reference scan of the printed English ciphertext |
+| [crypted-en-restored.txt](data/en/crypted-en-restored.txt) | Missing line inserted; all printed letters preserved |
+| [decrypted-en.txt](data/en/decrypted-en.txt) | Corrected English plaintext fixture; not a solver input |
+| [decrypted-en-restored.txt](data/en/decrypted-en-restored.txt) | Literal plaintext of the minimally restored book message |
+| [crypted-book-fragment-en.png](data/en/crypted-book-fragment-en.png) | Source plaintext scan, pages 132–133; grammar is skipped in the message |
+| [decrypted-en-source.txt](data/en/decrypted-en-source.txt) | Prose-only transcription for the source comparison |
+| [ENGLISH.md](data/en/ENGLISH.md) | Missing-line reconstruction and complete correction audit |
 | [q.txt](data/en/q.txt) | Original supplementary text |
 
 All four former Russian ciphertext copies and all three plaintext copies were
-verified byte-for-byte identical before consolidation. The English puzzle is
-not supported by the Russian language model.
+verified byte-for-byte identical before consolidation. The English puzzle uses the separate English model in `zig-english/`.
 
-### Suspected transcription error
+### English: missing line and errors in the printed ciphertext
+
+The original English ciphertext, as shown in the [book scan](data/en/crypted-en.png),
+has **both an entire missing line and erroneous letters in the remaining lines**.
+These problems are present in the printed source, not introduced by our transcription:
+
+- One **55-letter line** is missing between the lines beginning `ZTBCW` and
+  `YMTIK`. Restoring it brings the ciphertext from 595 to 650 letters and
+  restores the repeating key's alignment for the rest of the message.
+- **16 printed letters** decrypt incorrectly when compared with the
+  [source prose](data/en/crypted-book-fragment-en.png) and the expected `FINIS`
+  end marker. Their corrections are inferred from the intended plaintext;
+  they are documented editorial corrections, not an independently verified errata list.
+
+The three ciphertext files deliberately preserve different stages:
+
+| File in `data/en/` | Missing line | Original printed typos | Letters |
+| --- | --- | --- | ---: |
+| [crypted-en-book.txt](data/en/crypted-en-book.txt) | Still missing | Preserved | 595 |
+| [crypted-en-restored.txt](data/en/crypted-en-restored.txt) | Restored | Preserved | 650 |
+| [crypted-en.txt](data/en/crypted-en.txt) | Restored | 16 letters corrected | 650 |
+
+**`crypted-en-restored.txt` still contains the book's printed typos.
+`crypted-en.txt` has those 16 errors fixed.** The two files differ at exactly
+16 positions. The English cracker and web app use `crypted-en.txt` by default;
+the cracker itself does not insert the missing line or silently fix letters.
+
+The missing line was reconstructed using the source passage and checked by
+re-encryption; absent ciphertext cannot be uniquely recovered from ciphertext
+alone. See the [reconstruction audit](data/en/ENGLISH.md) for the recovered
+line, every correction, and the unexplained `ARI` suffix after `FINIS`.
+
+### Russian: suspected transcription error
 
 Literal decryption produces `ЧТЙОБЫЧНО`, where the surrounding Russian suggests
 `ЧТООБЫЧНО`. The likely error is ciphertext `Щ` at encrypted-letter position
@@ -271,10 +321,11 @@ The [anomaly image](data/ru/anomaly-ru.png) records this finding.
 
 ## Repository layout
 
-`go/`, `zig/`, and `vlang/` contain native implementations and tests.
+`go/`, `zig/`, and `vlang/` contain Russian native implementations and tests.
+`zig-english/` contains the English native solver, encoder, models and tests.
 `wasm/` contains the Zig Wasm wrapper, build, Bun CLI, and JS tests.
 `docs/` contains the static web app, built Wasm binary, and licensed dictionary.
-`data/` contains the shared puzzle assets. `scripts/` contains cross-language
+`data/ru/` and `data/en/` contain the puzzle assets for each language. `scripts/` contains cross-language
 utilities, and `benchmarks/` stores raw timing results.
 
 The native implementations keep aggregate model counts in `tri.txt` and `quad.txt`.
@@ -301,4 +352,5 @@ preserved, including the deployable `docs/vigenere.wasm`. Requires `just`.
 ## License
 
 [MIT](LICENSE) for code. The browser word-frequency data is separately licensed
-under CC BY-SA 4.0; see [third-party credits](docs/THIRD_PARTY.md).
+under CC BY-SA 4.0. English n-gram data is separately GNU LGPL; see
+[third-party credits](docs/THIRD_PARTY.md).

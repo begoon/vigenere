@@ -7,6 +7,8 @@ const result = Bun.spawnSync(["zig", "build", "-Doptimize=ReleaseFast"], {
 });
 if (result.exitCode !== 0) process.exit(result.exitCode);
 await mkdir(`${root}docs`, { recursive: true });
-await copyFile(`${root}wasm/zig-out/bin/vigenere.wasm`, `${root}docs/vigenere.wasm`);
-await copyFile(`${root}data/ru/crypted-ru.txt`, `${root}docs/crypted-ru.txt`);
-console.log("Built docs/vigenere.wasm and copied the sample ciphertext.");
+for (const [binary, sample] of [["vigenere", "ru"], ["vigenere-en", "en"]]) {
+  await copyFile(`${root}wasm/zig-out/bin/${binary}.wasm`, `${root}docs/${binary}.wasm`);
+  await copyFile(`${root}data/${sample}/crypted-${sample}.txt`, `${root}docs/crypted-${sample}.txt`);
+}
+console.log("Built Russian and English Wasm solvers and copied both samples.");
