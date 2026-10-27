@@ -14,7 +14,7 @@ zig build test -Doptimize=ReleaseSafe
 zig build test -Doptimize=ReleaseSafe -Dintegration=true
 ```
 
-The default is `data/en/crypted-en.txt` (from the root) or `../data/en/crypted-en.txt`
+The default is [data/en/crypted-en.txt](../data/en/crypted-en.txt) (from the root) or [../data/en/crypted-en.txt](../data/en/crypted-en.txt)
 (from this directory): the reconstructed, corrected 650-letter sample.
 ASCII A–Z/a–z are accepted; other bytes are ignored. Empty input fails.
 Output has the same period/key/alphabet/plaintext format as the Russian solver.
@@ -85,8 +85,8 @@ Golden plaintext and keys occur only in tests, not in the search.
 
 ## Language data
 
-`tri.txt` and `quad.txt` derive from John Burkardt's general English n-gram
-collection (upstream GNU LGPL data). `keywords.txt` derives from Hermit Dave's
+[tri.txt](tri.txt) and [quad.txt](quad.txt) derive from John Burkardt's general English n-gram
+collection (upstream GNU LGPL data). [keywords.txt](keywords.txt) derives from Hermit Dave's
 FrequencyWords / OpenSubtitles 2018 (CC BY-SA 4.0 data). These data licenses
 are separate from the MIT source-code license. Sources, hashes, transformations,
 and rebuild instructions are in [third-party credits](../docs/THIRD_PARTY.md).

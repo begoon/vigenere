@@ -25,7 +25,7 @@ zig build run -Doptimize=ReleaseFast -- ../data/ru/crypted-ru.txt
 ```
 
 The optional first argument is a UTF-8 ciphertext filename. Without it, the
-program locates `data/ru/crypted-ru.txt` from the repository root or this directory.
+program locates [data/ru/crypted-ru.txt](../data/ru/crypted-ru.txt) from the repository root or this directory.
 It prints the period, keyword, mixed alphabet and entire literal plaintext in
 the common output format. Input errors exit with status 1. Use an optimized
 build for the full search; the default build mode is Debug.
@@ -61,6 +61,6 @@ The [WebAssembly target](../wasm/README.md) imports this solver directly.
 the native `crack` entry point uses no callback. Rebuild the web binary with
 `bun wasm/build.js` from the repository root after changes to the solver.
 
-`tri.txt` and `quad.txt` are aggregate model counts embedded at compile time.
+[tri.txt](tri.txt) and [quad.txt](quad.txt) are aggregate model counts embedded at compile time.
 They have the same format and contents as Go's and V's files. Update all copies
 together; Go and V tests verify that they remain identical.

@@ -22,7 +22,7 @@ A letter-by-letter comparison after interpreting those markers has exactly
 one wording difference: the encrypted message says “all **of** the segments,”
 where the source scan says “all the segments.” The corrected ciphertext keeps
 that extra OF rather than silently forcing the book's prose wording. Marker
-positions are also recorded in `english-corrections.json`; do not remove every
+positions are also recorded in [english-corrections.json](english-corrections.json); do not remove every
 substring PARA indiscriminately, because SEPARATED also contains it. The full reconstructed message is a fixture in
 [decrypted-en.txt](decrypted-en.txt); the cracker never reads it.
 For the same message split into words and wrapped at 80 characters, see
@@ -65,7 +65,7 @@ HASQC WRFTX ETLFY IJGOA AOLAH YQAJO BGXER JHDZX ZHFMV RFGPY YABKY
 
 Insert this between the printed lines beginning `ZTBCW` and `YMTIK`.
 [crypted-en-restored.txt](crypted-en-restored.txt) does exactly that and changes none of the 595
-printed letters. Its literal decryption is `decrypted-en-restored.txt`.
+printed letters. Its literal decryption is [decrypted-en-restored.txt](decrypted-en-restored.txt).
 Both the corrected and this minimally restored ciphertext independently
 recover the key and alphabet in the Zig integration tests.
 
@@ -83,7 +83,7 @@ corresponding to the source passage. The ending FINI HARI needs no correction.
 They are editorial corrections, not changes silently made by the cracker.
 Positions are one-based in the **restored 650-letter** message; line/group/letter
 use eleven groups of five per line. The machine-readable audit is
-`english-corrections.json`.
+[english-corrections.json](english-corrections.json).
 
 | Position | Line/group/letter | Ciphertext | Plaintext |
 | ---: | --- | --- | --- |
