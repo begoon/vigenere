@@ -302,8 +302,8 @@ fn writeLetters(w: *std.Io.Writer, values: []const usize) !void {
     try w.writeByte('\n');
 }
 fn defaultFilename(io: std.Io) []const u8 {
-    std.Io.Dir.cwd().access(io, "data/crypted-ru.txt", .{}) catch return "../data/crypted-ru.txt";
-    return "data/crypted-ru.txt";
+    std.Io.Dir.cwd().access(io, "data/ru/crypted-ru.txt", .{}) catch return "../data/ru/crypted-ru.txt";
+    return "data/ru/crypted-ru.txt";
 }
 
 // Test fixtures live outside the implementation; no plaintext enters the binary.
@@ -359,7 +359,7 @@ test "period detection and short inputs" {
     for (&cipher, 0..) |*x, i| x.* = i % 7;
     try std.testing.expectApproxEqAbs(@as(f64, 1), indexOfCoincidence(&cipher, 7), 1e-12);
     const a = std.testing.allocator;
-    const supplied = try readTestFixture("../data/crypted-ru.txt");
+    const supplied = try readTestFixture("../data/ru/crypted-ru.txt");
     defer a.free(supplied);
     try std.testing.expectEqual(@as(usize, 738), supplied.len);
     try std.testing.expectEqual(@as(usize, 7), findPeriod(supplied));
@@ -455,9 +455,9 @@ test "incremental scoring matches full rescoring across accepted and rejected mo
 test "full recovery matches known key alphabet and plaintext" {
     if (!@import("test_options").integration) return error.SkipZigTest;
     const a = std.testing.allocator;
-    const cipher = try readTestFixture("../data/crypted-ru.txt");
+    const cipher = try readTestFixture("../data/ru/crypted-ru.txt");
     defer a.free(cipher);
-    const expected = try readTestFixture("../data/decrypted-ru.txt");
+    const expected = try readTestFixture("../data/ru/decrypted-ru.txt");
     defer a.free(expected);
     const scores = try Scores.init(a);
     defer scores.deinit(a);

@@ -30,7 +30,7 @@ It runs the Zig Wasm solver in a worker, shows progress and the recovered key,
 and displays both five-letter groups and estimated Russian word spacing.
 Preview with `just web-serve` and open `http://localhost:8000`.
 
-All use [`data/crypted-ru.txt`](data/crypted-ru.txt) by default. An optional
+All use [`data/ru/crypted-ru.txt`](data/ru/crypted-ru.txt) by default. An optional
 filename selects another ciphertext. Russian letters in either case are
 accepted; grouping, punctuation, Ё, and invalid UTF-8 are ignored. Input with
 no Russian letters fails. The supplied ciphertext has 738 letters and yields:
@@ -44,7 +44,7 @@ Decrypted text:
 ```
 
 The programs print the entire plaintext without spaces. The complete expected
-result is [`data/decrypted-ru.txt`](data/decrypted-ru.txt); it is a test fixture,
+result is [`data/ru/decrypted-ru.txt`](data/ru/decrypted-ru.txt); it is a test fixture,
 not an input to the attack.
 
 ## Cipher model
@@ -243,12 +243,12 @@ All puzzle assets live in [`data/`](data/):
 
 | File | Purpose |
 | --- | --- |
-| [crypted-ru.txt](data/crypted-ru.txt) | Russian ciphertext used by all implementations |
-| [decrypted-ru.txt](data/decrypted-ru.txt) | Golden expected plaintext, used only for validation |
-| [anomaly-ru.png](data/anomaly-ru.png) | Image documenting the suspected transcription error |
-| [crypted-en.txt](data/crypted-en.txt) | Separate English ciphertext puzzle |
-| [english.png](data/english.png) | Original English puzzle image |
-| [q.txt](data/q.txt) | Original supplementary text |
+| [crypted-ru.txt](data/ru/crypted-ru.txt) | Russian ciphertext used by all implementations |
+| [decrypted-ru.txt](data/ru/decrypted-ru.txt) | Golden expected plaintext, used only for validation |
+| [anomaly-ru.png](data/ru/anomaly-ru.png) | Image documenting the suspected transcription error |
+| [crypted-en.txt](data/en/crypted-en.txt) | Separate English ciphertext puzzle |
+| [crypted-book-fragment-en.png](data/en/crypted-book-fragment-en.png) | Original English puzzle image |
+| [q.txt](data/en/q.txt) | Original supplementary text |
 
 All four former Russian ciphertext copies and all three plaintext copies were
 verified byte-for-byte identical before consolidation. The English puzzle is
@@ -267,7 +267,7 @@ Literal decryption produces `ЧТЙОБЫЧНО`, where the surrounding Russian 
 
 Replacing `Щ` with `Ш` would produce the expected `О`. The programs and golden
 fixture preserve the literal result; they do not silently modify the input.
-The [anomaly image](data/anomaly-ru.png) records this finding.
+The [anomaly image](data/ru/anomaly-ru.png) records this finding.
 
 ## Repository layout
 

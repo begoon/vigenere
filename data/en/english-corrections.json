@@ -1,0 +1,198 @@
+{
+  "missing_line_after": 8,
+  "missing_letters": 55,
+  "missing_ciphertext": "HASQC WRFTX ETLFY IJGOA AOLAH YQAJO BGXER JHDZX ZHFMV RFGPY YABKY",
+  "corrections": [
+    {
+      "position": 7,
+      "line": 1,
+      "group": 2,
+      "letter": 2,
+      "printed": "O",
+      "corrected": "Y",
+      "literal_plaintext": "E",
+      "corrected_plaintext": "L"
+    },
+    {
+      "position": 61,
+      "line": 2,
+      "group": 2,
+      "letter": 1,
+      "printed": "C",
+      "corrected": "G",
+      "literal_plaintext": "V",
+      "corrected_plaintext": "E"
+    },
+    {
+      "position": 135,
+      "line": 3,
+      "group": 5,
+      "letter": 5,
+      "printed": "O",
+      "corrected": "P",
+      "literal_plaintext": "U",
+      "corrected_plaintext": "I"
+    },
+    {
+      "position": 227,
+      "line": 5,
+      "group": 2,
+      "letter": 2,
+      "printed": "C",
+      "corrected": "G",
+      "literal_plaintext": "R",
+      "corrected_plaintext": "A"
+    },
+    {
+      "position": 342,
+      "line": 7,
+      "group": 3,
+      "letter": 2,
+      "printed": "N",
+      "corrected": "J",
+      "literal_plaintext": "Y",
+      "corrected_plaintext": "H"
+    },
+    {
+      "position": 397,
+      "line": 8,
+      "group": 3,
+      "letter": 2,
+      "printed": "C",
+      "corrected": "G",
+      "literal_plaintext": "V",
+      "corrected_plaintext": "E"
+    },
+    {
+      "position": 404,
+      "line": 8,
+      "group": 4,
+      "letter": 4,
+      "printed": "S",
+      "corrected": "Z",
+      "literal_plaintext": "R",
+      "corrected_plaintext": "I"
+    },
+    {
+      "position": 409,
+      "line": 8,
+      "group": 5,
+      "letter": 4,
+      "printed": "C",
+      "corrected": "G",
+      "literal_plaintext": "R",
+      "corrected_plaintext": "A"
+    },
+    {
+      "position": 411,
+      "line": 8,
+      "group": 6,
+      "letter": 1,
+      "printed": "C",
+      "corrected": "G",
+      "literal_plaintext": "V",
+      "corrected_plaintext": "E"
+    },
+    {
+      "position": 433,
+      "line": 8,
+      "group": 10,
+      "letter": 3,
+      "printed": "A",
+      "corrected": "F",
+      "literal_plaintext": "R",
+      "corrected_plaintext": "A"
+    },
+    {
+      "position": 434,
+      "line": 8,
+      "group": 10,
+      "letter": 4,
+      "printed": "F",
+      "corrected": "A",
+      "literal_plaintext": "H",
+      "corrected_plaintext": "Y"
+    },
+    {
+      "position": 548,
+      "line": 10,
+      "group": 11,
+      "letter": 3,
+      "printed": "A",
+      "corrected": "Y",
+      "literal_plaintext": "O",
+      "corrected_plaintext": "B"
+    },
+    {
+      "position": 557,
+      "line": 11,
+      "group": 2,
+      "letter": 2,
+      "printed": "Y",
+      "corrected": "T",
+      "literal_plaintext": "A",
+      "corrected_plaintext": "R"
+    },
+    {
+      "position": 572,
+      "line": 11,
+      "group": 5,
+      "letter": 2,
+      "printed": "C",
+      "corrected": "G",
+      "literal_plaintext": "V",
+      "corrected_plaintext": "E"
+    },
+    {
+      "position": 601,
+      "line": 11,
+      "group": 11,
+      "letter": 1,
+      "printed": "A",
+      "corrected": "S",
+      "literal_plaintext": "R",
+      "corrected_plaintext": "O"
+    },
+    {
+      "position": 647,
+      "line": 12,
+      "group": 9,
+      "letter": 2,
+      "printed": "K",
+      "corrected": "R",
+      "literal_plaintext": "H",
+      "corrected_plaintext": "S"
+    }
+  ],
+  "markers": [
+    {
+      "position": 52,
+      "text": "STOP"
+    },
+    {
+      "position": 108,
+      "text": "STOP"
+    },
+    {
+      "position": 250,
+      "text": "STOP"
+    },
+    {
+      "position": 291,
+      "text": "PARA"
+    },
+    {
+      "position": 353,
+      "text": "STOP"
+    },
+    {
+      "position": 474,
+      "text": "STOP"
+    },
+    {
+      "position": 643,
+      "text": "FINIS"
+    }
+  ],
+  "post_finis_suffix": "ARI"
+}

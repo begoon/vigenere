@@ -3,7 +3,7 @@ module main
 import math
 import os
 
-const fixture_dir = @VMODROOT + '/../data'
+const fixture_dir = @VMODROOT + '/../data/ru'
 
 fn test_rng_and_normalization() {
 	mut random := Rng{ state: 0x9e3779b97f4a7c15 }

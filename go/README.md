@@ -14,7 +14,7 @@ From this directory:
 
 ```sh
 go run .
-go run . ../data/crypted-ru.txt
+go run . ../data/ru/crypted-ru.txt
 ```
 
 For repeated runs, build once:
@@ -25,7 +25,7 @@ go build -o vigenerecrack .
 ```
 
 The optional first argument is a UTF-8 ciphertext filename. Without it, the
-program locates `data/crypted-ru.txt` from the repository root or this directory.
+program locates `data/ru/crypted-ru.txt` from the repository root or this directory.
 It prints the period, keyword, mixed alphabet and entire literal plaintext in
 the common output format. Input errors exit with status 1.
 
@@ -39,7 +39,7 @@ VIGENERE_INTEGRATION=1 go test ./...
 The routine test checks incremental scores against full rescoring across the
 shared mutation matrix, including rollback and cache consistency. The opt-in
 integration test executes all 11.52 million proposals and verifies the period,
-keyword, alphabet and [`../data/decrypted-ru.txt`](../data/decrypted-ru.txt).
+keyword, alphabet and [`../data/ru/decrypted-ru.txt`](../data/ru/decrypted-ru.txt).
 
 ## Implementation notes
 

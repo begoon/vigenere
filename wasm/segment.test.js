@@ -22,7 +22,7 @@ test("frequency segmentation handles ambiguity, unknown spans, and productive ve
 test("vendored Russian dictionary preserves the golden text and recognizes technical words", async () => {
   const data = await Bun.file(new URL("../docs/ru-frequency.txt.gz", import.meta.url)).arrayBuffer();
   const segment = createSegmenter(gunzipSync(data).toString());
-  const plain = (await Bun.file(new URL("../data/decrypted-ru.txt", import.meta.url)).text()).trim();
+  const plain = (await Bun.file(new URL("../data/ru/decrypted-ru.txt", import.meta.url)).text()).trim();
   const words = segment(plain);
   expect(words.replaceAll(" ", "")).toBe(plain);
   expect(words).toStartWith("ЕДИНИЦА КОМПИЛЯЦИИ ЭТО ЦЕПОЧКА ЗАМКНУТЫХ ПРОГРАММНЫХ СЕГМЕНТОВ");

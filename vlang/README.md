@@ -15,7 +15,7 @@ From this directory:
 ```sh
 v -prod -o vigenerecrack .
 ./vigenerecrack
-./vigenerecrack ../data/crypted-ru.txt
+./vigenerecrack ../data/ru/crypted-ru.txt
 ```
 
 Or build and run in one command:
@@ -25,7 +25,7 @@ v -prod run .
 ```
 
 Use `-prod` for the full search. The optional first argument is a UTF-8
-ciphertext filename. Without it, the program locates `data/crypted-ru.txt` from
+ciphertext filename. Without it, the program locates `data/ru/crypted-ru.txt` from
 the repository root or this directory. It prints the period, keyword, mixed
 alphabet and entire literal plaintext in the common output format. Input
 errors exit with status 1.
@@ -42,7 +42,7 @@ Routine tests cover the RNG, normalization, period detection, model validation,
 rotation invariance, and the same incremental-score matrix as Go and Zig,
 including accepted proposals, rollback, and cache consistency. The opt-in
 integration test runs all 11.52 million proposals and checks the period,
-keyword, alphabet and every plaintext letter against `../data/decrypted-ru.txt`.
+keyword, alphabet and every plaintext letter against `../data/ru/decrypted-ru.txt`.
 The expected solution is only used in tests.
 
 To benchmark V and verify its complete CLI output, from the repository root:

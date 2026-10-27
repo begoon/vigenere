@@ -28,7 +28,7 @@ def main():
     )
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("--warmups", type=int, default=1)
-    parser.add_argument("--input", type=Path, default=ROOT / "data/crypted-ru.txt")
+    parser.add_argument("--input", type=Path, default=ROOT / "data/ru/crypted-ru.txt")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if args.runs < 1 or args.warmups < 0:
@@ -94,13 +94,13 @@ def main():
         expected = None
         known_input = (
             hashlib.sha256(ciphertext.read_bytes()).digest()
-            == hashlib.sha256((ROOT / "data/crypted-ru.txt").read_bytes()).digest()
+            == hashlib.sha256((ROOT / "data/ru/crypted-ru.txt").read_bytes()).digest()
         )
         if known_input:
             expected = (
                 "Detected key length: 7\nKeyword: РЕДИСКА\n"
                 "Base alphabet: ЕХЭЦРБТИОНЪДФГЩЯВУЗШЬЖКЛМПЫЮСЙЧА\nDecrypted text:\n"
-                + (ROOT / "data/decrypted-ru.txt").read_text(encoding="utf-8").strip()
+                + (ROOT / "data/ru/decrypted-ru.txt").read_text(encoding="utf-8").strip()
                 + "\n"
             ).encode()
         samples = {name: [] for name in commands}

@@ -367,11 +367,11 @@ fn load_language_scores() !([]f64, []f64) {
 }
 
 fn main() {
-	mut filename := 'data/crypted-ru.txt'
+	mut filename := 'data/ru/crypted-ru.txt'
 	if os.args.len > 1 {
 		filename = os.args[1]
 	} else if !os.exists(filename) {
-		filename = '../data/crypted-ru.txt'
+		filename = '../data/ru/crypted-ru.txt'
 	}
 	cipher := read_ciphertext(filename) or {
 		eprintln(err)

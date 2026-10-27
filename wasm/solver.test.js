@@ -33,8 +33,8 @@ test("wrapper validates input and supports repeated calls after memory growth", 
 
 const integration = process.env.VIGENERE_INTEGRATION === "1" ? test : test.skip;
 integration("full search matches the native CLI and every golden plaintext letter", async () => {
-  const cipher = await Bun.file(new URL("../data/crypted-ru.txt", import.meta.url)).text();
-  const expected = (await Bun.file(new URL("../data/decrypted-ru.txt", import.meta.url)).text()).trim();
+  const cipher = await Bun.file(new URL("../data/ru/crypted-ru.txt", import.meta.url)).text();
+  const expected = (await Bun.file(new URL("../data/ru/decrypted-ru.txt", import.meta.url)).text()).trim();
   const crack = await createSolver(bytes);
   const result = crack(cipher);
   expect(formatResult(result)).toBe(

@@ -12,7 +12,7 @@ From the repository root:
 ```sh
 bun wasm/build.js
 bun wasm/cli.js
-bun wasm/cli.js data/crypted-ru.txt
+bun wasm/cli.js data/ru/crypted-ru.txt
 ```
 
 `build.js` runs `zig build -Doptimize=ReleaseFast` in `wasm/`, then copies the

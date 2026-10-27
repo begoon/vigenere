@@ -90,7 +90,7 @@ func TestFullRecovery(t *testing.T) {
 	if os.Getenv("VIGENERE_INTEGRATION") != "1" {
 		t.Skip("full search is opt-in")
 	}
-	cipher, err := readCiphertext("../data/crypted-ru.txt")
+	cipher, err := readCiphertext("../data/ru/crypted-ru.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,7 +114,7 @@ func TestFullRecovery(t *testing.T) {
 	if recoveredAlphabet(answer.mapping, rotation) != "ЕХЭЦРБТИОНЪДФГЩЯВУЗШЬЖКЛМПЫЮСЙЧА" {
 		t.Fatal("incorrect alphabet")
 	}
-	expected, err := os.ReadFile("../data/decrypted-ru.txt")
+	expected, err := os.ReadFile("../data/ru/decrypted-ru.txt")
 	if err != nil {
 		t.Fatal(err)
 	}

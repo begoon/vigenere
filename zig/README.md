@@ -15,17 +15,17 @@ From this directory:
 ```sh
 zig build -Doptimize=ReleaseFast
 ./zig-out/bin/vigenerecrack
-./zig-out/bin/vigenerecrack ../data/crypted-ru.txt
+./zig-out/bin/vigenerecrack ../data/ru/crypted-ru.txt
 ```
 
 Or build and run in one command:
 
 ```sh
-zig build run -Doptimize=ReleaseFast -- ../data/crypted-ru.txt
+zig build run -Doptimize=ReleaseFast -- ../data/ru/crypted-ru.txt
 ```
 
 The optional first argument is a UTF-8 ciphertext filename. Without it, the
-program locates `data/crypted-ru.txt` from the repository root or this directory.
+program locates `data/ru/crypted-ru.txt` from the repository root or this directory.
 It prints the period, keyword, mixed alphabet and entire literal plaintext in
 the common output format. Input errors exit with status 1. Use an optimized
 build for the full search; the default build mode is Debug.
@@ -41,7 +41,7 @@ Routine tests cover normalization, period detection, rotation invariance,
 language counts, the RNG, and the same incremental-score matrix as Go.
 The opt-in integration test executes all 11.52 million proposals and checks
 the period, key, alphabet and every golden plaintext letter. Tests read the
-shared fixtures in `../data/`; `zig build` sets the test working directory.
+shared fixtures in `../data/ru/`; `zig build` sets the test working directory.
 The expected plaintext is not embedded in the solver.
 
 ## Implementation notes
