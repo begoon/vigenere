@@ -17,8 +17,12 @@ The [English cracker](zig-english/README.md) is implemented only in Zig,
 with its own English language model and a Wasm build. The web app switches
 between Russian and English. The English example reconstructs a missing
 55-letter line and explicitly corrects 16 printed letters; the original scan
-transcript and minimally restored version are retained. See the
-[reconstruction audit](data/en/ENGLISH.md), including the unexplained final ARI.
+transcript and minimally restored version are retained.
+
+**An interesting story behind the original print:** the book's English puzzle
+has an entire missing line, printed typos, and an unexplained suffix after the
+end marker. Read [how we reconstructed the original message](data/en/ENGLISH.md),
+with scans, the recovered line, and a correction-by-correction audit.
 
 ## Running the implementations
 
