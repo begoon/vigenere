@@ -5,6 +5,8 @@ Programmers*. The Vigenère base alphabet is an unknown permutation of the
 32-letter Russian alphabet, without Ё. Both the repeated keyword and the mixed
 alphabet must be recovered.
 
+Try the [online playground](https://demin.ws/vigenere/) to crack the cipher in your browser.
+
 The [Go](go/README.md), [Zig](zig/README.md), [V](vlang/README.md), and
 [WebAssembly](wasm/README.md) implementations
 use the same ciphertext-only attack. They share the language
