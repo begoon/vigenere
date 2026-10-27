@@ -102,6 +102,102 @@ as printed, in both the restored and corrected editions. All 650 letters
 are retained. The prose scan contains the compiler passage; the signature's
 context comes from Chapter 24's story.
 
+## Why the English Zig cracker differs from the Russian one
+
+The [Russian Zig solver](../../zig/README.md) and
+[English Zig solver](../../zig-english/README.md) attack the same kind of
+mixed-alphabet Vigenère cipher: both the alphabet permutation and the repeating
+key are unknown. Their main difference is how they choose starting candidates
+for the search, in addition to using different alphabets and language models.
+
+| Component | Russian (`zig/`) | English (`zig-english/`) |
+| --- | --- | --- |
+| Alphabet | 32 Russian letters, excluding Ё | 26 English letters, A–Z |
+| Plaintext scoring | Russian trigram and tetragram counts | English trigram and tetragram counts |
+| Period detection | First mean column coincidence above 0.045, otherwise the strongest candidate | Same rule, with threshold 0.060 |
+| Starting candidates | Random alphabet permutations and key shifts | Up to 32 vocabulary-ranked candidates; remaining restarts use frequency-seeded random candidates |
+| Contextual search | 48 restarts × 240,000 proposals | Same, plus the initialization work described below |
+| Final key rotation | Score 32 equivalent rotations | Score 26 equivalent rotations |
+
+Both period detectors consider lengths up to `min(20, ciphertext_length / 20)`.
+Their thresholds are language-specific heuristics, not guarantees that the
+first peak is the true period.
+
+### Why the English initialization was added
+
+During development, adapting the Russian random-start search to English did
+not consistently recover the English message within the same search budget.
+Even correcting letters in the ciphertext could change whether a run
+converged: those changes alter candidate scores and the sequence of accepted
+moves. A preliminary letter-frequency search alone also did not make recovery
+consistent across the restored and corrected examples.
+
+The additional initialization supplies more promising starting points before
+the contextual search. This is an observation about these samples, models,
+and search settings, not evidence that English is inherently harder to crack
+than Russian. The Russian implementation recovered its supplied puzzle without
+this extra machinery, so it retains the simpler initialization.
+
+### How vocabulary ranking and Hungarian assignment work
+
+1. **Infer a key length from the ciphertext.** Consider every word of that
+   length in a general English vocabulary. The vocabulary contains 58,076
+   words of length 3–20 occurring at least 100 times in the pinned
+   FrequencyWords source. It was filtered by those general rules, not selected
+   to contain the puzzle's answer.
+2. **Treat each word as a candidate key.** Its letter values give the shifts
+   for the repeating key columns. Count occurrences of each ciphertext letter
+   in each column.
+3. **Build a 26 × 26 assignment-cost table.** A row represents a ciphertext
+   letter and a column represents its proposed position in the mixed alphabet.
+   Given the candidate key, that assignment determines a plaintext letter in
+   each key column. Its cost is the sum of observed counts multiplied by the
+   negative log of the corresponding general English letter frequency.
+4. **Find the best bijective alphabet for that key.** The Hungarian algorithm
+   minimizes the total assignment cost while using every alphabet position
+   exactly once. Choosing the cheapest position independently for each letter
+   could assign several letters to the same position, which would not be a
+   valid alphabet permutation.
+5. **Rank the candidates by their assignment scores.** Keep the best 32 as
+   starting points for the contextual search. These are starting guesses,
+   not accepted answers: letter frequencies alone do not establish readable
+   plaintext.
+
+The other 16 restarts begin with random permutations and shifts, then run
+100,000 preliminary annealing proposals scored by single-letter frequencies.
+If fewer than 32 vocabulary candidates are available, more restarts use that
+fallback; if none are available, all 48 do. Thus equal contextual proposal
+counts do not mean equal total work: English also ranks vocabulary candidates
+and performs frequency-based initialization.
+
+### What remains the same, and what the solver does not know
+
+After initialization, both solvers perform simulated annealing with swaps of
+alphabet entries and changes to key-column shifts. They score candidate
+plaintext with log tetragram counts plus 0.25 times log trigram counts, rescore
+only affected windows, and use the same contextual cooling schedule. The
+English search can change the proposed key as well as the alphabet; it is not
+restricted to returning a vocabulary word.
+
+Both remove a redundant rotation during the search by fixing the first key
+shift to zero. Afterwards they score equivalent key rotations with their
+language's n-gram model to choose a plausible displayed keyword. Ciphertext
+alone cannot identify which equivalent rotation the author used.
+
+The English vocabulary and frequency tables are general language data. The
+cracker does not read the known plaintext, the scans, the reconstruction audit,
+or the expected key and alphabet from the tests. Reconstruction of the missing
+line and editorial correction of printed letters are separate preparation
+steps; the cracker receives the resulting ciphertext and recovers its literal
+plaintext. Native and browser/Wasm execution use the same Zig solver.
+
+Vocabulary initialization favors word-like keys, and recovery remains
+heuristic for arbitrary keys, short messages, or unusual language. Integration
+tests check both English editions and an independently written passage with a
+different key and alphabet; they do not establish a general success rate.
+The extra machinery could also be implemented in Go or added to Russian Zig.
+It is an implementation choice, not a limitation of Go or a requirement of Zig.
+
 ## Reproduce the checks
 
 From `zig-english/`:
