@@ -23,8 +23,8 @@ def main():
     parser.add_argument(
         "--languages",
         nargs="+",
-        choices=("go", "zig"),
-        default=["go", "zig"],
+        choices=("go", "zig", "vlang"),
+        default=["go", "zig", "vlang"],
     )
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("--warmups", type=int, default=1)
@@ -60,6 +60,12 @@ def main():
             commands["Zig"] = [str(tmp / "zig/bin/vigenerecrack")]
             versions["Zig"] = command(
                 ["zig", "version"], capture_output=True, text=True
+            ).stdout.strip()
+        if "vlang" in args.languages:
+            command(["v", "-prod", "-o", str(tmp / "v-crack"), str(ROOT / "vlang")])
+            commands["V"] = [str(tmp / "v-crack")]
+            versions["V"] = command(
+                ["v", "version"], capture_output=True, text=True
             ).stdout.strip()
         expected = None
         known_input = (

@@ -5,7 +5,8 @@ Programmers*. The Vigenère base alphabet is an unknown permutation of the
 32-letter Russian alphabet, without Ё. Both the repeated keyword and the mixed
 alphabet must be recovered.
 
-The [Go](go/README.md) and [Zig](zig/README.md) implementations use the same ciphertext-only attack. They share the language
+The [Go](go/README.md), [Zig](zig/README.md), and [V](vlang/README.md) implementations
+use the same ciphertext-only attack. They share the language
 counts, random generator, search budget, incremental scoring, and output format.
 There is no hardcoded plaintext phrase or keyword dictionary in the solver.
 
@@ -18,6 +19,7 @@ and tests:
 | --- | --- | --- |
 | [Go](go/README.md) | Go 1.26+; tested with Go 1.27.1 | `cd go && go run .` |
 | [Zig](zig/README.md) | Zig 0.16.0 | `cd zig && zig build run -Doptimize=ReleaseFast` |
+| [V](vlang/README.md) | Tested with V 0.5.2 | `cd vlang && v -prod run .` |
 
 All use [`data/crypted-ru.txt`](data/crypted-ru.txt) by default. An optional
 filename selects another ciphertext. Russian letters in either case are
@@ -138,6 +140,11 @@ A full score refresh every cooling epoch limits accumulated floating-point
 drift. This preserves the search budget while greatly reducing work compared
 with rescoring the entire plaintext on every proposal.
 
+V additionally precombines trigram/tetragram contributions in one lookup table
+and uses direct array access in the hot search functions. Its tests can force
+bounds checking back on. These optimizations preserve the scoring formula and
+proposal budget; see the [V implementation notes](vlang/README.md#implementation-notes).
+
 ### 5. Resolve the rotation ambiguity
 
 Adding the same offset `r` to every mapping entry and key shift leaves the
@@ -159,16 +166,18 @@ also heuristic, so recovery on arbitrary ciphertexts is not guaranteed.
 ## Benchmarks
 
 Measured on macOS 27.0.1 arm64, using default compiler targets, Go's normal
-optimized build and Zig ReleaseFast. Each implementation had one discarded
+optimized build, Zig ReleaseFast, and V `-prod`. Each implementation had one discarded
 warmup and three measured runs, in alternating order:
 
 | Implementation | Version | Median elapsed time |
 | --- | --- | ---: |
-| Zig | 0.16.0 | 4.34 s |
-| Go | 1.27.1 | 6.07 s |
+| Zig | 0.16.0 | 4.09 s |
+| V | 0.5.2 (`7ec4894`) | 4.42 s |
+| Go | 1.27.1 | 5.68 s |
 
-[Raw results](benchmarks/go-zig-incremental.json) include all samples, versions,
-and input/output hashes. Zig was about 1.40× faster in this comparison.
+[Raw results](benchmarks/go-zig-v-optimized.json) include all samples, versions,
+and input/output hashes. V's median was about 8% higher than Zig's and 22%
+lower than Go's in this comparison.
 Measurements on a non-isolated development machine are illustrative; timings
 vary across runs and machines.
 
@@ -179,14 +188,21 @@ the golden key, alphabet, and plaintext. These are measurements of this puzzle
 on one machine, not a general language ranking.
 
 To reproduce the comparison from the repository root (requires Python 3 for
-the benchmark script, plus Go and Zig):
+the benchmark script, plus Go, Zig, and V):
 
 ```sh
-python3 scripts/benchmark.py --runs 3 --warmups 1 --output benchmarks/go-zig-incremental.json
+python3 scripts/benchmark.py --runs 3 --warmups 1 --output benchmarks/go-zig-v-optimized.json
 ```
 
-Use `--runs 1 --warmups 0` for a quicker check, `--languages go` or
-`--languages zig` to select one implementation, or `--input PATH` for other input.
+Use `--runs 1 --warmups 0` for a quicker check, `--languages go`,
+`--languages zig`, or `--languages vlang` to select one implementation, or
+`--input PATH` for other input. Without `--languages`, the script benchmarks
+all three implementations (requiring Go, Zig, and V).
+
+Before V's direct array access, combined score table, and explicit indexed-loop
+optimizations, its median was 11.44 s ([previous results](benchmarks/go-zig-v-incremental.json)).
+The current 4.42 s median is about 2.59× faster. These are separate benchmark
+sessions, not interleaved before/after trials; the search budget is unchanged.
 
 Before incremental scoring, the Go/Zig medians were 25.232/22.880 seconds.
 The earlier optimized medians were 6.067/4.337 seconds: improvements of
@@ -196,9 +212,9 @@ before/after trials. Raw data: [original](benchmarks/go-zig-original.json) and
 
 ## Tests
 
-Both implementations compare incremental scores with full rescoring using identical
+All three implementations compare incremental scores with full rescoring using identical
 random seeds, text lengths (1, 2, 3, 4, 17, 80, 738), periods (1, 3, 7), every
-swap/column mutation, and repeated commits and rollbacks. Zig also
+swap/column mutation, and repeated commits and rollbacks. Zig and V also
 check normalization, period detection, RNG values, language counts, and rotation
 invariance. Full-search tests check the detected period, key, alphabet and all
 738 plaintext letters against the shared golden fixture.
@@ -212,7 +228,7 @@ All puzzle assets live in [`data/`](data/):
 
 | File | Purpose |
 | --- | --- |
-| [crypted-ru.txt](data/crypted-ru.txt) | Russian ciphertext used by both implementations |
+| [crypted-ru.txt](data/crypted-ru.txt) | Russian ciphertext used by all implementations |
 | [decrypted-ru.txt](data/decrypted-ru.txt) | Golden expected plaintext, used only for validation |
 | [anomaly-ru.png](data/anomaly-ru.png) | Image documenting the suspected transcription error |
 | [crypted-en.txt](data/crypted-en.txt) | Separate English ciphertext puzzle |
@@ -240,26 +256,26 @@ The [anomaly image](data/anomaly-ru.png) records this finding.
 
 ## Repository layout
 
-`go/` and `zig/` contain language implementations and tests.
+`go/`, `zig/`, and `vlang/` contain language implementations and tests.
 `data/` contains the shared puzzle assets. `scripts/` contains cross-language
 utilities, and `benchmarks/` stores raw timing results.
 
-Both implementations keep aggregate model counts in `tri.txt` and `quad.txt`.
+All implementations keep aggregate model counts in `tri.txt` and `quad.txt`.
 Each line contains a positive count, a space, and concatenated Russian n-grams
-of that size. Go embeds its files with `go:embed`; Zig uses `@embedFile`, so
-neither executable needs model files at runtime. Keep the Go and Zig copies
-identical when updating the model; Go's tests check this. These model files
-are distinct from the puzzle inputs and golden answer in `data/`.
+of that size. Go embeds its files with `go:embed`, Zig uses `@embedFile`, and V
+uses `$embed_file`, so the executables need no model files at runtime. Keep all
+three copies identical when updating the model; Go and V tests check this.
+These model files are distinct from the puzzle inputs and golden answer in `data/`.
 
 The former pure-Python solver is available in Git history at commit `29673fe`.
 It was removed because it duplicated the same algorithm with much longer
 runtimes. Python is only used for optional maintenance and benchmark scripts;
-neither solver needs it at runtime. Format those scripts with
+none of the solvers need it at runtime. Format those scripts with
 `uv tool run black scripts`.
 
 ## Cleanup
 
-Run `just clean` from the repository root to remove the Go executable, Zig
+Run `just clean` from the repository root to remove the Go and V executables, Zig
 build outputs/cache, Python bytecode caches, and the local `.venv`. Source,
 model files, shared puzzle data, benchmark results, and global tool caches are
 preserved. Requires `just`.

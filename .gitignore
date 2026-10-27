@@ -4,3 +4,4 @@ __pycache__
 zig/.zig-cache/
 zig/zig-out/
 go/vigenerecrack
+vlang/vigenerecrack

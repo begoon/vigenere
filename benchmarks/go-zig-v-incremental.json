@@ -1,0 +1,35 @@
+{
+  "implementation": "precomputed mutation plans and incremental scoring",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "versions": {
+    "Go": "go version go1.27.1 darwin/arm64",
+    "Zig": "0.16.0",
+    "V": "V 0.5.2 7ec4894"
+  },
+  "input": "data/crypted-ru.txt",
+  "input_sha256": "3398cda66bb66331117c74ca58c84360dd48d39098ab1d89f1f8550673774437",
+  "output_sha256": "bc891f0b9ff81c26e56cfd85adff48f9069d56b10f4142882e5f1ef9a16f0ef1",
+  "warmups_per_implementation": 1,
+  "seconds": {
+    "Go": [
+      5.291990166995674,
+      6.622825833968818,
+      5.561118375044316
+    ],
+    "Zig": [
+      4.063924042042345,
+      4.119062541052699,
+      4.059808250050992
+    ],
+    "V": [
+      11.443575041135773,
+      11.63781858398579,
+      10.805710916873068
+    ]
+  },
+  "median_seconds": {
+    "Go": 5.561118375044316,
+    "Zig": 4.063924042042345,
+    "V": 11.443575041135773
+  }
+}
