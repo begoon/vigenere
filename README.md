@@ -5,7 +5,8 @@ Programmers*. The Vigenère base alphabet is an unknown permutation of the
 32-letter Russian alphabet, without Ё. Both the repeated keyword and the mixed
 alphabet must be recovered.
 
-The [Go](go/README.md), [Zig](zig/README.md), and [V](vlang/README.md) implementations
+The [Go](go/README.md), [Zig](zig/README.md), [V](vlang/README.md), and
+[WebAssembly](wasm/README.md) implementations
 use the same ciphertext-only attack. They share the language
 counts, random generator, search budget, incremental scoring, and output format.
 There is no hardcoded plaintext phrase or keyword dictionary in the solver.
@@ -20,6 +21,12 @@ and tests:
 | [Go](go/README.md) | Go 1.26+; tested with Go 1.27.1 | `cd go && go run .` |
 | [Zig](zig/README.md) | Zig 0.16.0 | `cd zig && zig build run -Doptimize=ReleaseFast` |
 | [V](vlang/README.md) | Tested with V 0.5.2 | `cd vlang && v -prod run .` |
+| [Wasm / Bun](wasm/README.md) | Zig 0.16.0; tested with Bun 1.4.2 | `bun wasm/build.js && bun wasm/cli.js` |
+
+The [static web app](docs/README.md) lives in `docs/`, ready for GitHub Pages.
+It runs the Zig Wasm solver in a worker, shows progress and the recovered key,
+and displays both five-letter groups and estimated Russian word spacing.
+Preview with `just web-serve` and open `http://localhost:8000`.
 
 All use [`data/crypted-ru.txt`](data/crypted-ru.txt) by default. An optional
 filename selects another ciphertext. Russian letters in either case are
@@ -166,18 +173,19 @@ also heuristic, so recovery on arbitrary ciphertexts is not guaranteed.
 ## Benchmarks
 
 Measured on macOS 27.0.1 arm64, using default compiler targets, Go's normal
-optimized build, Zig ReleaseFast, and V `-prod`. Each implementation had one discarded
-warmup and three measured runs, in alternating order:
+optimized build, Zig ReleaseFast (native and Wasm), V `-prod`, and Bun 1.4.2.
+Each implementation had one discarded warmup and three measured runs, in alternating order:
 
 | Implementation | Version | Median elapsed time |
 | --- | --- | ---: |
-| Zig | 0.16.0 | 4.09 s |
-| V | 0.5.2 (`7ec4894`) | 4.42 s |
-| Go | 1.27.1 | 5.68 s |
+| V | 0.5.2 (`7ec4894`) | 4.02 s |
+| Zig | 0.16.0 | 4.10 s |
+| Wasm (Bun) | Zig 0.16.0 / Bun 1.4.2 | 4.44 s |
+| Go | 1.27.1 | 5.36 s |
 
-[Raw results](benchmarks/go-zig-v-optimized.json) include all samples, versions,
-and input/output hashes. V's median was about 8% higher than Zig's and 22%
-lower than Go's in this comparison.
+[Raw results](benchmarks/go-zig-v-wasm.json) include all samples, versions,
+and input/output hashes. Wasm under Bun was about 8% slower than native Zig
+in this comparison, including Bun startup and Wasm compilation/instantiation.
 Measurements on a non-isolated development machine are illustrative; timings
 vary across runs and machines.
 
@@ -188,21 +196,22 @@ the golden key, alphabet, and plaintext. These are measurements of this puzzle
 on one machine, not a general language ranking.
 
 To reproduce the comparison from the repository root (requires Python 3 for
-the benchmark script, plus Go, Zig, and V):
+the benchmark script, plus Go, Zig, V, and Bun):
 
 ```sh
-python3 scripts/benchmark.py --runs 3 --warmups 1 --output benchmarks/go-zig-v-optimized.json
+python3 scripts/benchmark.py --runs 3 --warmups 1 --output benchmarks/go-zig-v-wasm.json
 ```
 
 Use `--runs 1 --warmups 0` for a quicker check, `--languages go`,
-`--languages zig`, or `--languages vlang` to select one implementation, or
-`--input PATH` for other input. Without `--languages`, the script benchmarks
-all three implementations (requiring Go, Zig, and V).
+`--languages zig`, `--languages vlang`, or `--languages wasm` to select one
+implementation, or `--input PATH` for other input. Without `--languages`, the script benchmarks
+all four implementations (requiring Go, Zig, V, and Bun). Browser dictionary
+loading and word segmentation are presentation steps excluded from CLI timings.
 
 Before V's direct array access, combined score table, and explicit indexed-loop
 optimizations, its median was 11.44 s ([previous results](benchmarks/go-zig-v-incremental.json)).
-The current 4.42 s median is about 2.59× faster. These are separate benchmark
-sessions, not interleaved before/after trials; the search budget is unchanged.
+The [first optimized 4.42 s median](benchmarks/go-zig-v-optimized.json) was about
+2.59× faster. These are separate benchmark sessions, not interleaved before/after trials; the search budget is unchanged.
 
 Before incremental scoring, the Go/Zig medians were 25.232/22.880 seconds.
 The earlier optimized medians were 6.067/4.337 seconds: improvements of
@@ -212,12 +221,16 @@ before/after trials. Raw data: [original](benchmarks/go-zig-original.json) and
 
 ## Tests
 
-All three implementations compare incremental scores with full rescoring using identical
+The three native implementations compare incremental scores with full rescoring using identical
 random seeds, text lengths (1, 2, 3, 4, 17, 80, 738), periods (1, 3, 7), every
 swap/column mutation, and repeated commits and rollbacks. Zig and V also
 check normalization, period detection, RNG values, language counts, and rotation
 invariance. Full-search tests check the detected period, key, alphabet and all
 738 plaintext letters against the shared golden fixture.
+
+Wasm imports the tested Zig solver. Its Bun tests additionally check the memory
+interface, input limits, repeated calls, progress, formatting, segmentation, and
+opt-in full recovery.
 
 See the language READMEs for routine and full-test commands. Full recovery is
 opt-in to keep routine tests short.
@@ -256,16 +269,19 @@ The [anomaly image](data/anomaly-ru.png) records this finding.
 
 ## Repository layout
 
-`go/`, `zig/`, and `vlang/` contain language implementations and tests.
+`go/`, `zig/`, and `vlang/` contain native implementations and tests.
+`wasm/` contains the Zig Wasm wrapper, build, Bun CLI, and JS tests.
+`docs/` contains the static web app, built Wasm binary, and licensed dictionary.
 `data/` contains the shared puzzle assets. `scripts/` contains cross-language
 utilities, and `benchmarks/` stores raw timing results.
 
-All implementations keep aggregate model counts in `tri.txt` and `quad.txt`.
+The native implementations keep aggregate model counts in `tri.txt` and `quad.txt`.
 Each line contains a positive count, a space, and concatenated Russian n-grams
 of that size. Go embeds its files with `go:embed`, Zig uses `@embedFile`, and V
 uses `$embed_file`, so the executables need no model files at runtime. Keep all
 three copies identical when updating the model; Go and V tests check this.
-These model files are distinct from the puzzle inputs and golden answer in `data/`.
+Wasm embeds the Zig copies directly. These model files are distinct from the
+puzzle inputs and golden answer in `data/`.
 
 The former pure-Python solver is available in Git history at commit `29673fe`.
 It was removed because it duplicated the same algorithm with much longer
@@ -276,10 +292,11 @@ none of the solvers need it at runtime. Format those scripts with
 ## Cleanup
 
 Run `just clean` from the repository root to remove the Go and V executables, Zig
-build outputs/cache, Python bytecode caches, and the local `.venv`. Source,
+and Wasm build outputs/cache, Python bytecode caches, and the local `.venv`. Source,
 model files, shared puzzle data, benchmark results, and global tool caches are
-preserved. Requires `just`.
+preserved, including the deployable `docs/vigenere.wasm`. Requires `just`.
 
 ## License
 
-[MIT](LICENSE).
+[MIT](LICENSE) for code. The browser word-frequency data is separately licensed
+under CC BY-SA 4.0; see [third-party credits](docs/THIRD_PARTY.md).

@@ -23,8 +23,8 @@ def main():
     parser.add_argument(
         "--languages",
         nargs="+",
-        choices=("go", "zig", "vlang"),
-        default=["go", "zig", "vlang"],
+        choices=("go", "zig", "vlang", "wasm"),
+        default=["go", "zig", "vlang", "wasm"],
     )
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("--warmups", type=int, default=1)
@@ -67,6 +67,30 @@ def main():
             versions["V"] = command(
                 ["v", "version"], capture_output=True, text=True
             ).stdout.strip()
+        if "wasm" in args.languages:
+            command(
+                [
+                    "zig",
+                    "build",
+                    "-Doptimize=ReleaseFast",
+                    "--prefix",
+                    str(tmp / "wasm"),
+                ],
+                ROOT / "wasm",
+                env=env,
+            )
+            commands["Wasm (Bun)"] = ["bun", str(ROOT / "wasm/cli.js")]
+            env["VIGENERE_WASM"] = str(tmp / "wasm/bin/vigenere.wasm")
+            versions["Wasm (Bun)"] = (
+                "Zig "
+                + command(
+                    ["zig", "version"], capture_output=True, text=True
+                ).stdout.strip()
+                + "; Bun "
+                + command(
+                    ["bun", "--version"], capture_output=True, text=True
+                ).stdout.strip()
+            )
         expected = None
         known_input = (
             hashlib.sha256(ciphertext.read_bytes()).digest()
@@ -93,7 +117,7 @@ def main():
                 print(f"Starting {name} {label}...", flush=True)
                 start = time.perf_counter()
                 result = command(
-                    [*commands[name], str(ciphertext)], stdout=subprocess.PIPE
+                    [*commands[name], str(ciphertext)], stdout=subprocess.PIPE, env=env
                 )
                 elapsed = time.perf_counter() - start
                 if expected is None:
